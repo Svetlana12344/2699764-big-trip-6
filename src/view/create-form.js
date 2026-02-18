@@ -1,5 +1,4 @@
-const createCreateFormTemplate = () => {
-  return `<li class="trip-events__item">
+const createCreateFormTemplate = () => `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
@@ -161,7 +160,6 @@ const createCreateFormTemplate = () => {
       </section>
     </form>
   </li>`;
-};
 
 export default class CreateForm {
   getElement() {

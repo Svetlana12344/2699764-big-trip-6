@@ -1,5 +1,4 @@
-const createRoutePointTemplate = () => {
-  return `<li class="trip-events__item">
+const createRoutePointTemplate = () => `<li class="trip-events__item">
     <div class="event">
       <time class="event__date" datetime="2019-03-18">MAR 18</time>
       <div class="event__type">
@@ -36,7 +35,6 @@ const createRoutePointTemplate = () => {
       </button>
     </div>
   </li>`;
-};
 
 export default class RoutePoint {
   getElement() {

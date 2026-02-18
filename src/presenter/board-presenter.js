@@ -15,16 +15,16 @@ export default class BoardPresenter {
   init() {
     // Отрисовка фильтров
     this.renderFilters();
-    
+
     // Отрисовка сортировки
     this.renderSorting();
-    
+
     // Создаём контейнер для списка событий
     this.createEventsList();
-    
+
     // Отрисовка формы редактирования (первой)
     this.renderEditForm();
-    
+
     // Отрисовка трёх точек маршрута
     this.renderRoutePoints(3);
   }
