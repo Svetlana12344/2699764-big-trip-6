@@ -1,7 +1,7 @@
 import { TYPES } from '../const.js';
-import { getRandomInt, getRandomArrayItem, generateId, generateDate } from '../utils/common.js';
-import { generateOffers } from './offer.js';
-import { generateDestinations } from './destination.js';
+import { getRandomInt, getRandomArrayItem, generateId, generateDate } from '../utils/common-utils.js';
+import { generateOffers } from './offer-mock.js';
+import { generateDestinations } from './destination-mock.js';
 
 function generatePoint() {
   const type = getRandomArrayItem(TYPES);

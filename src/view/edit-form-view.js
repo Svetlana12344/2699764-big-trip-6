@@ -13,9 +13,6 @@ const createEditFormTemplate = (point) => {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
   
-  const startTime = new Date(dateFrom);
-  const endTime = new Date(dateTo);
-  
   const startDateStr = formatDate(startTime);
   const endDateStr = formatDate(endTime);
   

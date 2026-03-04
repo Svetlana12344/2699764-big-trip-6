@@ -1,5 +1,5 @@
 import { OFFER_TYPES } from '../const.js';
-import { getRandomInt, getRandomArrayItem, generateId } from '../utils/common.js';
+import { getRandomInt, getRandomArrayItem, generateId } from '../utils/common-utils.js';
 
 const OFFER_PRICES = {
   luggage: 30,
