@@ -1,7 +1,7 @@
-import Filters from '../view/filters.js';
-import Sorting from '../view/sorting.js';
-import EditForm from '../view/edit-form.js';
-import RoutePoint from '../view/route-point.js';
+import Filters from '../view/filters-view.js';
+import Sorting from '../view/sorting-view.js';
+import EditForm from '../view/edit-form-view.js';
+import RoutePoint from '../view/route-point-view.js';
 
 export default class BoardPresenter {
   constructor({ pointsModel }) {
