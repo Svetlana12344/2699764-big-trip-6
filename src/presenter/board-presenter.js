@@ -1,14 +1,16 @@
-import Filters from '../view/filters.js';
-import Sorting from '../view/sorting.js';
-import EditForm from '../view/edit-form.js';
-import RoutePoint from '../view/route-point.js';
+import Filters from '../view/filters-view.js';
+import Sorting from '../view/sorting-view.js';
+import EditForm from '../view/edit-form-view.js';
+import RoutePoint from '../view/route-point-view.js';
 
 export default class BoardPresenter {
-  constructor() {
+  constructor({ pointsModel }) {
+    this.pointsModel = pointsModel;
     this.boardContainer = document.querySelector('.trip-events');
     this.filtersContainer = document.querySelector('.trip-main__trip-controls');
     this.sortingContainer = this.boardContainer;
     this.eventsList = null;
+    this.routePoints = [];
   }
 
   init() {
@@ -16,7 +18,7 @@ export default class BoardPresenter {
     this.renderSorting();
     this.createEventsList();
     this.renderEditForm();
-    this.renderRoutePoints(3);
+    this.renderRoutePoints();
   }
 
   renderFilters() {
@@ -42,14 +44,19 @@ export default class BoardPresenter {
   }
 
   renderEditForm() {
-    const editForm = new EditForm();
+    const points = this.pointsModel.getPoints();
+    const firstPoint = points[0];
+    const editForm = new EditForm(firstPoint);
     this.eventsList.prepend(editForm.getElement());
   }
 
-  renderRoutePoints(count) {
-    for (let i = 0; i < count; i++) {
-      const routePoint = new RoutePoint();
+  renderRoutePoints() {
+    const points = this.pointsModel.getPoints();
+    
+    this.routePoints = points.map((point) => new RoutePoint(point));
+    
+    this.routePoints.forEach((routePoint) => {
       this.eventsList.appendChild(routePoint.getElement());
-    }
+    });
   }
 }

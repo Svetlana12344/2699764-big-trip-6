@@ -1,4 +1,7 @@
 import BoardPresenter from './presenter/board-presenter.js';
+import PointsModel from './model/point-model.js';
 
-const boardPresenter = new BoardPresenter();
+const pointsModel = new PointsModel();
+const boardPresenter = new BoardPresenter({ pointsModel });
+
 boardPresenter.init();

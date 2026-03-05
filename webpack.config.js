@@ -19,6 +19,17 @@ module.exports = {
         hot: true,
         open: true,
     },
+    resolve: {
+        extensions: ['.js'],
+        alias: { 
+            '@const': path.resolve(__dirname, 'src/const.js'),
+            '@model': path.resolve(__dirname, 'src/model/'),
+            '@mock': path.resolve(__dirname, 'src/mock/'),
+            '@presenter': path.resolve(__dirname, 'src/presenter/'),
+            '@utils': path.resolve(__dirname, 'src/utils/'),
+            '@view': path.resolve(__dirname, 'src/view/'),
+        }
+    },
     module: {
         rules: [
             {
