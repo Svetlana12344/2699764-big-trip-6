@@ -23,4 +23,3 @@ function generateDate() {
 }
 
 export { getRandomInt, getRandomArrayItem, getRandomSubarray, generateId, generateDate };
-
