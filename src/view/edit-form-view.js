@@ -1,7 +1,7 @@
 import AbstractView from './abstract-view.js';
 
 const createEditFormTemplate = (point) => {
-  const { type, destination, basePrice, dateFrom, dateTo, offers } = point;
+  const { type, destination, basePrice, dateFrom, dateTo } = point;
 
   const startTime = new Date(dateFrom);
   const endTime = new Date(dateTo);
