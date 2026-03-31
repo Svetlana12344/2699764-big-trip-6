@@ -8,16 +8,15 @@ export default class BoardPresenter {
     this.pointsModel = pointsModel;
     this.boardContainer = document.querySelector('.trip-events');
     this.filtersContainer = document.querySelector('.trip-main__trip-controls');
-    this.sortingContainer = this.boardContainer;
     this.eventsList = null;
     this.routePoints = [];
+    this.currentEditForm = null;
   }
 
   init() {
     this.renderFilters();
     this.renderSorting();
     this.createEventsList();
-    this.renderEditForm();
     this.renderRoutePoints();
   }
 
@@ -26,13 +25,13 @@ export default class BoardPresenter {
     const filtersSection = document.querySelector('.trip-controls__filters');
     if (filtersSection) {
       filtersSection.innerHTML = '';
-      filtersSection.appendChild(filters.getElement());
+      filtersSection.appendChild(filters.element);
     }
   }
 
   renderSorting() {
     const sorting = new Sorting();
-    const sortingElement = sorting.getElement();
+    const sortingElement = sorting.element;
     sortingElement.classList.add('trip-events__trip-sort');
     this.boardContainer.prepend(sortingElement);
   }
@@ -43,20 +42,45 @@ export default class BoardPresenter {
     this.boardContainer.appendChild(this.eventsList);
   }
 
-  renderEditForm() {
-    const points = this.pointsModel.getPoints();
-    const firstPoint = points[0];
-    const editForm = new EditForm(firstPoint);
-    this.eventsList.prepend(editForm.getElement());
-  }
-
   renderRoutePoints() {
     const points = this.pointsModel.getPoints();
-    
+
     this.routePoints = points.map((point) => new RoutePoint(point));
-    
+
     this.routePoints.forEach((routePoint) => {
-      this.eventsList.appendChild(routePoint.getElement());
+      routePoint.setRollupClickHandler(() => {
+        this.replacePointToEditForm(routePoint);
+      });
+      this.eventsList.appendChild(routePoint.element);
     });
+  }
+
+  replacePointToEditForm(routePoint) {
+    const editForm = new EditForm(routePoint.point);
+
+    editForm.setFormSubmitHandler(() => {
+      this.replaceEditFormToPoint(editForm, routePoint);
+    });
+
+    editForm.setRollupClickHandler(() => {
+      this.replaceEditFormToPoint(editForm, routePoint);
+    });
+
+    this.eventsList.replaceChild(editForm.element, routePoint.element);
+    this.currentEditForm = editForm;
+
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape') {
+        this.replaceEditFormToPoint(editForm, routePoint);
+        document.removeEventListener('keydown', onEscKeyDown);
+      }
+    };
+
+    document.addEventListener('keydown', onEscKeyDown);
+  }
+
+  replaceEditFormToPoint(editForm, routePoint) {
+    this.eventsList.replaceChild(routePoint.element, editForm.element);
+    this.currentEditForm = null;
   }
 }

@@ -1,3 +1,5 @@
+import AbstractView from './abstract-view.js';
+
 const createSortingTemplate = () => `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
     <div class="trip-sort__item  trip-sort__item--day">
       <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" checked>
@@ -25,10 +27,8 @@ const createSortingTemplate = () => `<form class="trip-events__trip-sort  trip-s
     </div>
   </form>`;
 
-export default class Sorting {
-  getElement() {
-    const element = document.createElement('div');
-    element.innerHTML = createSortingTemplate();
-    return element.firstElementChild;
+export default class Sorting extends AbstractView {
+  get template() {
+    return createSortingTemplate();
   }
 }
