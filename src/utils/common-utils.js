@@ -22,7 +22,5 @@ function generateDate() {
   return futureDate.toISOString();
 }
 
-import { getRandomInt, getRandomArrayItem, getRandomSubarray, generateId, generateDate } from './common-utils.js';
-
 export { getRandomInt, getRandomArrayItem, getRandomSubarray, generateId, generateDate };
 
