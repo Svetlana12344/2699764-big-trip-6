@@ -7,7 +7,6 @@ export default class BoardPresenter {
   constructor({ pointsModel }) {
     this.pointsModel = pointsModel;
     this.boardContainer = document.querySelector('.trip-events');
-    this.filtersContainer = document.querySelector('.trip-main__trip-controls');
     this.eventsList = null;
     this.routePoints = [];
     this.currentEditForm = null;
