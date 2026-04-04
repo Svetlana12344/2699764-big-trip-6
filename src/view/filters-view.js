@@ -1,3 +1,5 @@
+import AbstractView from './abstract-view.js';
+
 const createFiltersTemplate = () => `<form class="trip-filters" action="#" method="get">
     <div class="trip-filters__filter">
       <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" checked>
@@ -22,10 +24,8 @@ const createFiltersTemplate = () => `<form class="trip-filters" action="#" metho
     <button class="visually-hidden" type="submit">Accept filter</button>
   </form>`;
 
-export default class Filters {
-  getElement() {
-    const element = document.createElement('div');
-    element.innerHTML = createFiltersTemplate();
-    return element.firstElementChild;
+export default class Filters extends AbstractView {
+  get template() {
+    return createFiltersTemplate();
   }
 }

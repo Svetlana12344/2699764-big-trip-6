@@ -33,3 +33,4 @@ function generateOffers(count = getRandomInt(1, 5)) {
 }
 
 export { generateOffer, generateOffers };
+

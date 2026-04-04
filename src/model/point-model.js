@@ -4,7 +4,7 @@ export default class PointsModel {
   #points = [];
 
   constructor() {
-    this.#points = generatePoints(3); 
+    this.#points = generatePoints(3);
   }
 
   getPoints() {

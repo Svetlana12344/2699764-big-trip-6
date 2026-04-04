@@ -1,29 +1,31 @@
+import AbstractView from './abstract-view.js';
+
 const createRoutePointTemplate = (point) => {
   const { type, destination, basePrice, dateFrom, dateTo, offers, isFavorite } = point;
-  
+
   const startTime = new Date(dateFrom);
   const endTime = new Date(dateTo);
   const date = startTime.toLocaleString('en', { month: 'short', day: '2-digit' }).toUpperCase();
   const startTimeStr = startTime.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
   const endTimeStr = endTime.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
-  
+
   const durationMs = endTime - startTime;
   const durationMin = Math.floor(durationMs / (1000 * 60));
   const hours = Math.floor(durationMin / 60);
   const minutes = durationMin % 60;
-  
+
   let durationStr = '';
   if (hours > 0) {
     durationStr = `${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
   } else {
     durationStr = `${minutes}M`;
   }
-  
-  const selectedOffers = offers.filter(offer => offer.accepted);
-  
+
+  const selectedOffers = offers.filter((offer) => offer.accepted);
+
   const offersTemplate = selectedOffers.length > 0 ? `
     <ul class="event__selected-offers">
-      ${selectedOffers.map(offer => `
+      ${selectedOffers.map((offer) => `
         <li class="event__offer">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -32,11 +34,10 @@ const createRoutePointTemplate = (point) => {
       `).join('')}
     </ul>
   ` : '';
-  
+
   const favoriteClass = isFavorite ? 'event__favorite-btn--active' : '';
-  
   const formattedType = type.charAt(0).toUpperCase() + type.slice(1);
-  
+
   return `<li class="trip-events__item">
     <div class="event">
       <time class="event__date" datetime="${startTime.toISOString().split('T')[0]}">${date}</time>
@@ -70,22 +71,23 @@ const createRoutePointTemplate = (point) => {
   </li>`;
 };
 
-export default class RoutePoint {
+export default class RoutePoint extends AbstractView {
   constructor(point) {
+    super();
     this.point = point;
-    this.element = null;
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = document.createElement('div');
-      this.element.innerHTML = createRoutePointTemplate(this.point);
-      this.element = this.element.firstElementChild;
-    }
-    return this.element;
+  get template() {
+    return createRoutePointTemplate(this.point);
   }
 
-  removeElement() {
-    this.element = null;
+  setRollupClickHandler(callback) {
+    this._callback.rollupClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollupClickHandler);
   }
+
+  #rollupClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.rollupClick();
+  };
 }
