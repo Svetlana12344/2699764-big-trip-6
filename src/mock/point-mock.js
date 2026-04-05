@@ -7,7 +7,7 @@ function generatePoint() {
   const type = getRandomArrayItem(TYPES);
   const destinations = generateDestinations();
   const destination = getRandomArrayItem(destinations);
-  const offers = generateOffers();
+  const offers = generateOffers(getRandomInt(1, 3));
   const startDate = generateDate();
   const endDate = new Date(new Date(startDate).getTime() + getRandomInt(1, 5) * 60 * 60 * 1000).toISOString();
 
