@@ -1,5 +1,5 @@
 import { OFFER_TYPES } from '../const.js';
-import { getRandomInt, getRandomArrayItem, generateId } from '../utils/common-utils.js';
+import { getRandomInt, generateId } from '../utils/common-utils.js';
 
 const OFFER_PRICES = {
   luggage: 30,
@@ -17,8 +17,7 @@ const OFFER_TITLES = {
   train: 'Travel by train'
 };
 
-function generateOffer() {
-  const type = getRandomArrayItem(OFFER_TYPES);
+function generateOffer(type) {
   return {
     id: generateId(),
     title: OFFER_TITLES[type],
@@ -28,9 +27,10 @@ function generateOffer() {
   };
 }
 
-function generateOffers(count = getRandomInt(1, 5)) {
-  return Array.from({ length: count }, generateOffer);
+function generateOffers(count = getRandomInt(1, 3)) {
+  const shuffledTypes = [...OFFER_TYPES].sort(() => 0.5 - Math.random());
+  const selectedTypes = shuffledTypes.slice(0, count);
+  return selectedTypes.map((type) => generateOffer(type));
 }
 
 export { generateOffer, generateOffers };
-

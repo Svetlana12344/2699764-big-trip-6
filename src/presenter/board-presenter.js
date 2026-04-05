@@ -2,6 +2,7 @@ import Filters from '../view/filters-view.js';
 import Sorting from '../view/sorting-view.js';
 import EditForm from '../view/edit-form-view.js';
 import RoutePoint from '../view/route-point-view.js';
+import EmptyPoints from '../view/empty-points-view.js';
 
 export default class BoardPresenter {
   constructor({ pointsModel }) {
@@ -16,7 +17,7 @@ export default class BoardPresenter {
     this.renderFilters();
     this.renderSorting();
     this.createEventsList();
-    this.renderRoutePoints();
+    this.renderPoints();
   }
 
   renderFilters() {
@@ -41,9 +42,30 @@ export default class BoardPresenter {
     this.boardContainer.appendChild(this.eventsList);
   }
 
-  renderRoutePoints() {
+  clearPointsList() {
+    this.eventsList.innerHTML = '';
+    this.routePoints = [];
+  }
+
+  renderPoints() {
+    this.clearPointsList();
     const points = this.pointsModel.getPoints();
 
+    if (points.length === 0) {
+      this.renderEmptyPoints();
+      return;
+    }
+
+    this.renderSorting();
+    this.renderRoutePoints(points);
+  }
+
+  renderEmptyPoints() {
+    const emptyPoints = new EmptyPoints();
+    this.eventsList.appendChild(emptyPoints.element);
+  }
+
+  renderRoutePoints(points) {
     this.routePoints = points.map((point) => new RoutePoint(point));
 
     this.routePoints.forEach((routePoint) => {

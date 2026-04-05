@@ -1,8 +1,8 @@
 export default class AbstractView {
   #element = null;
-  #callback = {};
 
   constructor() {
+    this._callback = {};
     if (new.target === AbstractView) {
       throw new Error('Can\'t instantiate AbstractView, only concrete one.');
     }

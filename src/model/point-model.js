@@ -10,4 +10,12 @@ export default class PointsModel {
   getPoints() {
     return this.#points;
   }
+
+  clearPoints() {
+    this.#points = [];
+  }
+
+  setPoints(points) {
+    this.#points = points;
+  }
 }
