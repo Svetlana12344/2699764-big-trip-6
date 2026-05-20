@@ -2,6 +2,7 @@ import Filters from '../view/filters-view.js';
 import Sorting from '../view/sorting-view.js';
 import EmptyPoints from '../view/empty-points-view.js';
 import PointPresenter from './point-presenter.js';
+import { sortPointsByDay, sortPointsByTime, sortPointsByPrice, SortType } from '../utils/sort-utils.js';
 
 export default class BoardPresenter {
   constructor({ pointsModel }) {
@@ -10,6 +11,8 @@ export default class BoardPresenter {
     this.eventsList = null;
     this.pointPresenters = new Map();
     this.currentOpenPoint = null;
+    this.currentSortType = SortType.DAY;
+    this.sortingComponent = null;
   }
 
   init() {
@@ -29,8 +32,9 @@ export default class BoardPresenter {
   }
 
   renderSorting() {
-    const sorting = new Sorting();
-    const sortingElement = sorting.element;
+    this.sortingComponent = new Sorting();
+    this.sortingComponent.setSortTypeChangeHandler(this.handleSortTypeChange.bind(this));
+    const sortingElement = this.sortingComponent.element;
     sortingElement.classList.add('trip-events__trip-sort');
     this.boardContainer.prepend(sortingElement);
   }
@@ -46,9 +50,22 @@ export default class BoardPresenter {
     this.pointPresenters.clear();
   }
 
+  getSortedPoints() {
+    const points = [...this.pointsModel.getPoints()];
+
+    switch (this.currentSortType) {
+      case SortType.TIME:
+        return points.sort(sortPointsByTime);
+      case SortType.PRICE:
+        return points.sort(sortPointsByPrice);
+      default:
+        return points.sort(sortPointsByDay);
+    }
+  }
+
   renderPoints() {
     this.clearPointsList();
-    const points = this.pointsModel.getPoints();
+    const points = this.getSortedPoints();
 
     if (points.length === 0) {
       this.renderEmptyPoints();
@@ -73,6 +90,16 @@ export default class BoardPresenter {
     this.eventsList.appendChild(emptyPoints.element);
   }
 
+  handleSortTypeChange(sortType) {
+    if (this.currentSortType === sortType) {
+      return;
+    }
+
+    this.currentSortType = sortType;
+    this.resetAllPointsView();
+    this.renderPoints();
+  }
+
   handlePointChange(updatedPoint) {
     const points = this.pointsModel.getPoints();
     const index = points.findIndex((point) => point.id === updatedPoint.id);
@@ -80,11 +107,8 @@ export default class BoardPresenter {
     if (index !== -1) {
       points[index] = updatedPoint;
       this.pointsModel.setPoints(points);
-
-      const pointPresenter = this.pointPresenters.get(updatedPoint.id);
-      if (pointPresenter) {
-        pointPresenter.update(updatedPoint);
-      }
+      this.resetAllPointsView();
+      this.renderPoints();
     }
   }
 
@@ -93,7 +117,6 @@ export default class BoardPresenter {
       this.currentOpenPoint.resetView();
       this.currentOpenPoint = null;
     }
-
     this.currentOpenPoint = this.pointPresenters.get(this.currentOpenPoint?.point?.id);
   }
 
