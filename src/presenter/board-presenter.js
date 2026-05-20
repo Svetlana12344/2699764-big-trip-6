@@ -76,11 +76,11 @@ export default class BoardPresenter {
   handlePointChange(updatedPoint) {
     const points = this.pointsModel.getPoints();
     const index = points.findIndex((point) => point.id === updatedPoint.id);
-    
+
     if (index !== -1) {
       points[index] = updatedPoint;
       this.pointsModel.setPoints(points);
-      
+
       const pointPresenter = this.pointPresenters.get(updatedPoint.id);
       if (pointPresenter) {
         pointPresenter.update(updatedPoint);
@@ -93,7 +93,7 @@ export default class BoardPresenter {
       this.currentOpenPoint.resetView();
       this.currentOpenPoint = null;
     }
-    
+
     this.currentOpenPoint = this.pointPresenters.get(this.currentOpenPoint?.point?.id);
   }
 
