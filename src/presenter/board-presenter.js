@@ -1,16 +1,15 @@
 import Filters from '../view/filters-view.js';
 import Sorting from '../view/sorting-view.js';
-import EditForm from '../view/edit-form-view.js';
-import RoutePoint from '../view/route-point-view.js';
 import EmptyPoints from '../view/empty-points-view.js';
+import PointPresenter from './point-presenter.js';
 
 export default class BoardPresenter {
   constructor({ pointsModel }) {
     this.pointsModel = pointsModel;
     this.boardContainer = document.querySelector('.trip-events');
     this.eventsList = null;
-    this.routePoints = [];
-    this.currentEditForm = null;
+    this.pointPresenters = new Map();
+    this.currentOpenPoint = null;
   }
 
   init() {
@@ -44,7 +43,7 @@ export default class BoardPresenter {
 
   clearPointsList() {
     this.eventsList.innerHTML = '';
-    this.routePoints = [];
+    this.pointPresenters.clear();
   }
 
   renderPoints() {
@@ -56,8 +55,17 @@ export default class BoardPresenter {
       return;
     }
 
-    this.renderSorting();
-    this.renderRoutePoints(points);
+    points.forEach((point) => {
+      const pointPresenter = new PointPresenter({
+        point: point,
+        onDataChange: this.handlePointChange.bind(this),
+        onModeChange: this.handleModeChange.bind(this)
+      });
+
+      pointPresenter.init();
+      this.eventsList.appendChild(pointPresenter.routePointComponent.element);
+      this.pointPresenters.set(point.id, pointPresenter);
+    });
   }
 
   renderEmptyPoints() {
@@ -65,43 +73,34 @@ export default class BoardPresenter {
     this.eventsList.appendChild(emptyPoints.element);
   }
 
-  renderRoutePoints(points) {
-    this.routePoints = points.map((point) => new RoutePoint(point));
+  handlePointChange(updatedPoint) {
+    const points = this.pointsModel.getPoints();
+    const index = points.findIndex((point) => point.id === updatedPoint.id);
 
-    this.routePoints.forEach((routePoint) => {
-      routePoint.setRollupClickHandler(() => {
-        this.replacePointToEditForm(routePoint);
-      });
-      this.eventsList.appendChild(routePoint.element);
-    });
-  }
+    if (index !== -1) {
+      points[index] = updatedPoint;
+      this.pointsModel.setPoints(points);
 
-  replacePointToEditForm(routePoint) {
-    const editForm = new EditForm(routePoint.point);
-
-    editForm.setFormSubmitHandler(() => {
-      this.replaceEditFormToPoint(editForm, routePoint);
-    });
-
-    editForm.setRollupClickHandler(() => {
-      this.replaceEditFormToPoint(editForm, routePoint);
-    });
-
-    this.eventsList.replaceChild(editForm.element, routePoint.element);
-    this.currentEditForm = editForm;
-
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape') {
-        this.replaceEditFormToPoint(editForm, routePoint);
-        document.removeEventListener('keydown', onEscKeyDown);
+      const pointPresenter = this.pointPresenters.get(updatedPoint.id);
+      if (pointPresenter) {
+        pointPresenter.update(updatedPoint);
       }
-    };
-
-    document.addEventListener('keydown', onEscKeyDown);
+    }
   }
 
-  replaceEditFormToPoint(editForm, routePoint) {
-    this.eventsList.replaceChild(routePoint.element, editForm.element);
-    this.currentEditForm = null;
+  handleModeChange() {
+    if (this.currentOpenPoint) {
+      this.currentOpenPoint.resetView();
+      this.currentOpenPoint = null;
+    }
+
+    this.currentOpenPoint = this.pointPresenters.get(this.currentOpenPoint?.point?.id);
+  }
+
+  resetAllPointsView() {
+    this.pointPresenters.forEach((presenter) => {
+      presenter.resetView();
+    });
+    this.currentOpenPoint = null;
   }
 }

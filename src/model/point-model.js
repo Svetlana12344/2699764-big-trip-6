@@ -11,11 +11,11 @@ export default class PointsModel {
     return this.#points;
   }
 
-  clearPoints() {
-    this.#points = [];
-  }
-
   setPoints(points) {
     this.#points = points;
+  }
+
+  clearPoints() {
+    this.#points = [];
   }
 }
