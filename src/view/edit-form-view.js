@@ -1,6 +1,6 @@
 import AbstractStatefulView from './abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.min.css';
+//import 'flatpickr/dist/flatpickr.min.css';
 import { formatDate } from '../utils/date-utils.js';
 
 const createEditFormTemplate = (state) => {
@@ -301,25 +301,25 @@ export default class EditForm extends AbstractStatefulView {
   };
 
   #offersChangeHandler = (evt) => {
-    evt.preventDefault();
-    const offerId = evt.target.dataset.offerId;
-    const currentOffers = [...this._state.offers];
-    const offerIndex = currentOffers.findIndex((offer) => offer.id === offerId);
+  evt.preventDefault();
+  const offerId = evt.target.dataset.offerId;
+  const currentOffers = [...this._state.offers];
+  const offerIndex = currentOffers.findIndex((offer) => offer.id === offerId);
 
-    if (offerIndex === -1) {
-      const allCurrentOffers = this._allOffers[this._state.type] || [];
-      const offer = allCurrentOffers.find((offer) => offer.id === offerId);
-      if (offer) {
-        currentOffers.push({ ...offer, accepted: true });
-      }
-    } else {
-      currentOffers.splice(offerIndex, 1);
+  if (offerIndex === -1) {
+    const allCurrentOffers = this._allOffers[this._state.type] || [];
+    const newOffer = allCurrentOffers.find((offer) => offer.id === offerId);
+    if (newOffer) {
+      currentOffers.push({ ...newOffer, accepted: true });
     }
+  } else {
+    currentOffers.splice(offerIndex, 1);
+  }
 
-    this.updateState({
-      offers: currentOffers
-    });
-  };
+  this.updateState({
+    offers: currentOffers
+  });
+};
 
   #startDateChangeHandler = ([userDate]) => {
     this.updateState({
