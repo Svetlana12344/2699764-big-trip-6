@@ -1,25 +1,13 @@
 import AbstractView from './abstract-view.js';
+import { formatShortDate, formatTime, formatDuration } from '../utils/date-utils.js';
 
 const createRoutePointTemplate = (point) => {
   const { type, destination, basePrice, dateFrom, dateTo, offers, isFavorite } = point;
 
-  const startTime = new Date(dateFrom);
-  const endTime = new Date(dateTo);
-  const date = startTime.toLocaleString('en', { month: 'short', day: '2-digit' }).toUpperCase();
-  const startTimeStr = startTime.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
-  const endTimeStr = endTime.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
-
-  const durationMs = endTime - startTime;
-  const durationMin = Math.floor(durationMs / (1000 * 60));
-  const hours = Math.floor(durationMin / 60);
-  const minutes = durationMin % 60;
-
-  let durationStr = '';
-  if (hours > 0) {
-    durationStr = `${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
-  } else {
-    durationStr = `${minutes}M`;
-  }
+  const date = formatShortDate(dateFrom);
+  const startTimeStr = formatTime(dateFrom);
+  const endTimeStr = formatTime(dateTo);
+  const durationStr = formatDuration(dateFrom, dateTo);
 
   const selectedOffers = offers.filter((offer) => offer.accepted);
 
@@ -40,16 +28,16 @@ const createRoutePointTemplate = (point) => {
 
   return `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="${startTime.toISOString().split('T')[0]}">${date}</time>
+      <time class="event__date" datetime="${dateFrom}">${date}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${formattedType} ${destination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${startTime.toISOString()}">${startTimeStr}</time>
+          <time class="event__start-time" datetime="${dateFrom}">${startTimeStr}</time>
           &mdash;
-          <time class="event__end-time" datetime="${endTime.toISOString()}">${endTimeStr}</time>
+          <time class="event__end-time" datetime="${dateTo}">${endTimeStr}</time>
         </p>
         <p class="event__duration">${durationStr}</p>
       </div>
