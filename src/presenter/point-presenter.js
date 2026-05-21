@@ -48,11 +48,9 @@ export default class PointPresenter {
       allOffers: this.allOffers,
       isNew: false
     });
-    
     this.editFormComponent.setFormSubmitHandler(() => {
       this.replaceToRoutePoint();
     });
-    
     this.editFormComponent.setRollupClickHandler(() => {
       this.replaceToRoutePoint();
     });

@@ -3,26 +3,20 @@ import duration from 'dayjs/plugin/duration.js';
 
 dayjs.extend(duration);
 
-export const formatDate = (date, format = 'DD/MM/YY HH:mm') => {
-  return dayjs(date).format(format);
-};
+export const formatDate = (date, format = 'DD/MM/YY HH:mm') => dayjs(date).format(format);
 
-export const formatShortDate = (date) => {
-  return dayjs(date).format('MMM DD').toUpperCase();
-};
+export const formatShortDate = (date) => dayjs(date).format('MMM DD').toUpperCase();
 
-export const formatTime = (date) => {
-  return dayjs(date).format('HH:mm');
-};
+export const formatTime = (date) => dayjs(date).format('HH:mm');
 
 export const formatDuration = (dateFrom, dateTo) => {
   const diff = dayjs(dateTo).diff(dayjs(dateFrom));
-  const duration = dayjs.duration(diff);
-  
-  const days = Math.floor(duration.asDays());
-  const hours = duration.hours();
-  const minutes = duration.minutes();
-  
+  const durationObj = dayjs.duration(diff);
+
+  const days = Math.floor(durationObj.asDays());
+  const hours = durationObj.hours();
+  const minutes = durationObj.minutes();
+
   if (days > 0) {
     return `${days.toString().padStart(2, '0')}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
   }
@@ -32,6 +26,4 @@ export const formatDuration = (dateFrom, dateTo) => {
   return `${minutes}M`;
 };
 
-export const isDateEqual = (dateA, dateB) => {
-  return dayjs(dateA).isSame(dateB, 'minute');
-};
+export const isDateEqual = (dateA, dateB) => dayjs(dateA).isSame(dateB, 'minute');

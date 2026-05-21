@@ -42,8 +42,8 @@ const createEditFormTemplate = (state) => {
       <h3 class="event__section-title event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
         ${currentOffers.map((offer) => {
-          const isChecked = offers.some((selected) => selected.id === offer.id);
-          return `
+    const isChecked = offers.some((selected) => selected.id === offer.id);
+    return `
             <div class="event__offer-selector">
               <input
                 class="event__offer-checkbox visually-hidden"
@@ -60,7 +60,7 @@ const createEditFormTemplate = (state) => {
               </label>
             </div>
           `;
-        }).join('')}
+  }).join('')}
       </div>
     </section>
   ` : '';
@@ -235,8 +235,8 @@ export default class EditForm extends AbstractStatefulView {
   }
 
   setOffersChangeHandler() {
-    const offerCheckboxes = this.element.querySelectorAll('.event__offer-checkbox');
-    offerCheckboxes.forEach((checkbox) => {
+    const offerCheckboxesElements = this.element.querySelectorAll('.event__offer-checkbox');
+    offerCheckboxesElements.forEach((checkbox) => {
       checkbox.addEventListener('change', this.#offersChangeHandler);
     });
   }
@@ -281,7 +281,7 @@ export default class EditForm extends AbstractStatefulView {
     evt.preventDefault();
     const newType = evt.target.value;
     const newOffers = this._allOffers[newType] || [];
-    
+
     this.updateState({
       type: newType,
       offers: newOffers.filter((offer) => offer.accepted)
@@ -292,7 +292,7 @@ export default class EditForm extends AbstractStatefulView {
     evt.preventDefault();
     const destinationName = evt.target.value;
     const newDestination = this._destinations.find((dest) => dest.name === destinationName);
-    
+
     if (newDestination) {
       this.updateState({
         destination: newDestination
@@ -305,7 +305,7 @@ export default class EditForm extends AbstractStatefulView {
     const offerId = evt.target.dataset.offerId;
     const currentOffers = [...this._state.offers];
     const offerIndex = currentOffers.findIndex((offer) => offer.id === offerId);
-    
+
     if (offerIndex === -1) {
       const allCurrentOffers = this._allOffers[this._state.type] || [];
       const offer = allCurrentOffers.find((offer) => offer.id === offerId);
@@ -315,7 +315,7 @@ export default class EditForm extends AbstractStatefulView {
     } else {
       currentOffers.splice(offerIndex, 1);
     }
-    
+
     this.updateState({
       offers: currentOffers
     });
