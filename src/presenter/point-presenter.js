@@ -2,8 +2,10 @@ import RoutePoint from '../view/route-point-view.js';
 import EditForm from '../view/edit-form-view.js';
 
 export default class PointPresenter {
-  constructor({ point, onDataChange, onModeChange }) {
+  constructor({ point, destinations, allOffers, onDataChange, onModeChange }) {
     this.point = point;
+    this.destinations = destinations;
+    this.allOffers = allOffers;
     this.onDataChange = onDataChange;
     this.onModeChange = onModeChange;
     this.routePointComponent = null;
@@ -40,10 +42,17 @@ export default class PointPresenter {
       this.editFormComponent.removeElement();
     }
 
-    this.editFormComponent = new EditForm(this.point);
+    this.editFormComponent = new EditForm({
+      point: this.point,
+      destinations: this.destinations,
+      allOffers: this.allOffers,
+      isNew: false
+    });
+    
     this.editFormComponent.setFormSubmitHandler(() => {
       this.replaceToRoutePoint();
     });
+    
     this.editFormComponent.setRollupClickHandler(() => {
       this.replaceToRoutePoint();
     });

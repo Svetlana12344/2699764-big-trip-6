@@ -3,6 +3,8 @@ import Sorting from '../view/sorting-view.js';
 import EmptyPoints from '../view/empty-points-view.js';
 import PointPresenter from './point-presenter.js';
 import { sortPointsByDay, sortPointsByTime, sortPointsByPrice, SortType } from '../utils/sort-utils.js';
+import { generateDestinations } from '../mock/destination-mock.js';
+import { generateOffers } from '../mock/offer-mock.js';
 
 export default class BoardPresenter {
   constructor({ pointsModel }) {
@@ -13,6 +15,17 @@ export default class BoardPresenter {
     this.currentOpenPoint = null;
     this.currentSortType = SortType.DAY;
     this.sortingComponent = null;
+    this.destinations = generateDestinations();
+    this.allOffers = this._generateAllOffers();
+  }
+
+  _generateAllOffers() {
+    const types = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+    const offers = {};
+    types.forEach((type) => {
+      offers[type] = generateOffers(3);
+    });
+    return offers;
   }
 
   init() {
@@ -75,6 +88,8 @@ export default class BoardPresenter {
     points.forEach((point) => {
       const pointPresenter = new PointPresenter({
         point: point,
+        destinations: this.destinations,
+        allOffers: this.allOffers,
         onDataChange: this.handlePointChange.bind(this),
         onModeChange: this.handleModeChange.bind(this)
       });
