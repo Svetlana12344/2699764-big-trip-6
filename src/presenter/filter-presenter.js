@@ -1,5 +1,4 @@
 import Filters from '../view/filters-view.js';
-import { FilterType } from '../utils/filter-utils.js';
 
 export default class FilterPresenter {
   constructor({ filterModel, onFilterChange }) {
