@@ -1,20 +1,30 @@
-import Filters from '../view/filters-view.js';
 import Sorting from '../view/sorting-view.js';
 import EmptyPoints from '../view/empty-points-view.js';
 import PointPresenter from './point-presenter.js';
 import { sortPointsByDay, sortPointsByTime, sortPointsByPrice, SortType } from '../utils/sort-utils.js';
+import { filter } from '../utils/filter-utils.js';
 import { generateDestinations } from '../mock/destination-mock.js';
 import { generateOffers } from '../mock/offer-mock.js';
 
+const EMPTY_MESSAGES = {
+  'everything': 'Click New Event to create your first point',
+  'future': 'There are no future events now',
+  'present': 'There are no present events now',
+  'past': 'There are no past events now'
+};
+
 export default class BoardPresenter {
-  constructor({ pointsModel }) {
+  constructor({ pointsModel, filterModel, onNewPointDestroy }) {
     this.pointsModel = pointsModel;
+    this.filterModel = filterModel;
+    this.onNewPointDestroy = onNewPointDestroy;
     this.boardContainer = document.querySelector('.trip-events');
     this.eventsList = null;
     this.pointPresenters = new Map();
     this.currentOpenPoint = null;
     this.currentSortType = SortType.DAY;
     this.sortingComponent = null;
+    this.isNewPointCreating = false;
     this.destinations = generateDestinations();
     this.allOffers = this._generateAllOffers();
   }
@@ -29,22 +39,17 @@ export default class BoardPresenter {
   }
 
   init() {
-    this.renderFilters();
     this.renderSorting();
     this.createEventsList();
     this.renderPoints();
-  }
-
-  renderFilters() {
-    const filters = new Filters();
-    const filtersSection = document.querySelector('.trip-controls__filters');
-    if (filtersSection) {
-      filtersSection.innerHTML = '';
-      filtersSection.appendChild(filters.element);
-    }
+    this.pointsModel.addObserver(() => this.renderPoints());
+    this.filterModel.addObserver(() => this.renderPoints());
   }
 
   renderSorting() {
+    if (this.sortingComponent) {
+      this.sortingComponent.removeElement();
+    }
     this.sortingComponent = new Sorting();
     this.sortingComponent.setSortTypeChangeHandler(this.handleSortTypeChange.bind(this));
     const sortingElement = this.sortingComponent.element;
@@ -53,18 +58,26 @@ export default class BoardPresenter {
   }
 
   createEventsList() {
+    if (this.eventsList) {
+      this.eventsList.remove();
+    }
     this.eventsList = document.createElement('ul');
     this.eventsList.classList.add('trip-events__list');
     this.boardContainer.appendChild(this.eventsList);
   }
 
   clearPointsList() {
-    this.eventsList.innerHTML = '';
+    this.pointPresenters.forEach((presenter) => presenter.destroy());
     this.pointPresenters.clear();
+    if (this.eventsList) {
+      this.eventsList.innerHTML = '';
+    }
   }
 
   getSortedPoints() {
-    const points = [...this.pointsModel.getPoints()];
+    const filterType = this.filterModel.getFilter();
+    const filteredPoints = filter[filterType](this.pointsModel.getPoints());
+    const points = [...filteredPoints];
 
     switch (this.currentSortType) {
       case SortType.TIME:
@@ -85,6 +98,10 @@ export default class BoardPresenter {
       return;
     }
 
+    if (!this.sortingComponent) {
+      this.renderSorting();
+    }
+
     points.forEach((point) => {
       const pointPresenter = new PointPresenter({
         point: point,
@@ -101,7 +118,9 @@ export default class BoardPresenter {
   }
 
   renderEmptyPoints() {
-    const emptyPoints = new EmptyPoints();
+    const filterType = this.filterModel.getFilter();
+    const message = EMPTY_MESSAGES[filterType] || 'Click New Event to create your first point';
+    const emptyPoints = new EmptyPoints(message);
     this.eventsList.appendChild(emptyPoints.element);
   }
 
@@ -109,22 +128,18 @@ export default class BoardPresenter {
     if (this.currentSortType === sortType) {
       return;
     }
-
     this.currentSortType = sortType;
     this.resetAllPointsView();
     this.renderPoints();
   }
 
-  handlePointChange(updatedPoint) {
-    const points = this.pointsModel.getPoints();
-    const index = points.findIndex((point) => point.id === updatedPoint.id);
-
-    if (index !== -1) {
-      points[index] = updatedPoint;
-      this.pointsModel.setPoints(points);
-      this.resetAllPointsView();
-      this.renderPoints();
+  handlePointChange(updatedPoint, isDeleting = false) {
+    if (isDeleting) {
+      this.pointsModel.deletePoint(updatedPoint.id);
+    } else {
+      this.pointsModel.updatePoint(updatedPoint);
     }
+    this.resetAllPointsView();
   }
 
   handleModeChange() {
@@ -132,7 +147,6 @@ export default class BoardPresenter {
       this.currentOpenPoint.resetView();
       this.currentOpenPoint = null;
     }
-    this.currentOpenPoint = this.pointPresenters.get(this.currentOpenPoint?.point?.id);
   }
 
   resetAllPointsView() {
@@ -140,5 +154,67 @@ export default class BoardPresenter {
       presenter.resetView();
     });
     this.currentOpenPoint = null;
+  }
+
+  createNewPoint() {
+    if (this.isNewPointCreating) {
+      return;
+    }
+
+    this.isNewPointCreating = true;
+    this.resetAllPointsView();
+
+    const newPoint = {
+      id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(),
+      type: 'flight',
+      destination: this.destinations[0],
+      basePrice: 0,
+      dateFrom: new Date().toISOString(),
+      dateTo: new Date(Date.now() + 3600000).toISOString(),
+      offers: [],
+      isFavorite: false
+    };
+
+    const newPointPresenter = new PointPresenter({
+      point: newPoint,
+      destinations: this.destinations,
+      allOffers: this.allOffers,
+      onDataChange: this.handleNewPointChange.bind(this),
+      onModeChange: this.handleNewPointModeChange.bind(this),
+      isNew: true
+    });
+
+    newPointPresenter.init();
+    newPointPresenter.replaceToEditForm();
+    this.eventsList.prepend(newPointPresenter.routePointComponent.element);
+    this.pointPresenters.set(newPoint.id, newPointPresenter);
+  }
+
+  handleNewPointChange(updatedPoint, isDeleting = false) {
+    if (isDeleting) {
+      this.destroyNewPoint();
+      return;
+    }
+
+    this.pointsModel.addPoint(updatedPoint);
+    this.destroyNewPoint();
+    this.resetAllPointsView();
+    this.renderPoints();
+  }
+
+  handleNewPointModeChange() {
+    if (this.currentOpenPoint) {
+      this.currentOpenPoint.resetView();
+      this.currentOpenPoint = null;
+    }
+  }
+
+  destroyNewPoint() {
+    if (this.currentOpenPoint && this.currentOpenPoint.isNew) {
+      this.currentOpenPoint.destroy();
+      this.pointPresenters.delete(this.currentOpenPoint.point.id);
+    }
+    this.isNewPointCreating = false;
+    this.onNewPointDestroy();
   }
 }
