@@ -1,13 +1,20 @@
 import RoutePoint from '../view/route-point-view.js';
 import EditForm from '../view/edit-form-view.js';
 
+export const UserAction = {
+  UPDATE: 'UPDATE',
+  DELETE: 'DELETE',
+  CREATE: 'CREATE'
+};
+
 export default class PointPresenter {
-  constructor({ point, destinations, allOffers, onDataChange, onModeChange }) {
+  constructor({ point, destinations, allOffers, onDataChange, onModeChange, isNew = false }) {
     this.point = point;
     this.destinations = destinations;
     this.allOffers = allOffers;
     this.onDataChange = onDataChange;
     this.onModeChange = onModeChange;
+    this.isNew = isNew;
     this.routePointComponent = null;
     this.editFormComponent = null;
     this.isEditMode = false;
@@ -31,7 +38,7 @@ export default class PointPresenter {
         ...this.point,
         isFavorite: !this.point.isFavorite
       };
-      this.onDataChange(updatedPoint);
+      this.onDataChange(updatedPoint, UserAction.UPDATE);
     });
 
     return this.routePointComponent.element;
@@ -46,16 +53,28 @@ export default class PointPresenter {
       point: this.point,
       destinations: this.destinations,
       allOffers: this.allOffers,
-      isNew: false
+      isNew: this.isNew
     });
+
     this.editFormComponent.setFormSubmitHandler(() => {
-      this.replaceToRoutePoint();
+      this.handleFormSubmit();
     });
+
     this.editFormComponent.setRollupClickHandler(() => {
       this.replaceToRoutePoint();
     });
 
+    this.editFormComponent.setDeleteClickHandler(() => {
+      this.onDataChange(this.point, UserAction.DELETE);
+    });
+
     return this.editFormComponent.element;
+  }
+
+  handleFormSubmit() {
+    const formData = this.editFormComponent.getData();
+    this.onDataChange(formData, UserAction.UPDATE);
+    this.replaceToRoutePoint();
   }
 
   replaceToEditForm() {
@@ -70,7 +89,11 @@ export default class PointPresenter {
 
     const onEscKeyDown = (evt) => {
       if (evt.key === 'Escape') {
-        this.replaceToRoutePoint();
+        if (this.isNew) {
+          this.onDataChange(null, UserAction.DELETE);
+        } else {
+          this.replaceToRoutePoint();
+        }
         document.removeEventListener('keydown', onEscKeyDown);
       }
     };
@@ -97,6 +120,15 @@ export default class PointPresenter {
   resetView() {
     if (this.isEditMode) {
       this.replaceToRoutePoint();
+    }
+  }
+
+  destroy() {
+    if (this.routePointComponent) {
+      this.routePointComponent.removeElement();
+    }
+    if (this.editFormComponent) {
+      this.editFormComponent.removeElement();
     }
   }
 
