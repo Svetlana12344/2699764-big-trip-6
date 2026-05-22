@@ -1,6 +1,5 @@
 import AbstractStatefulView from './abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
-//import 'flatpickr/dist/flatpickr.min.css';
 import { formatDate } from '../utils/date-utils.js';
 
 const createEditFormTemplate = (state) => {
@@ -182,6 +181,7 @@ export default class EditForm extends AbstractStatefulView {
 
   _getStateFromPoint(point) {
     return {
+      id: point.id,
       type: point.type,
       destination: point.destination,
       basePrice: point.basePrice,
@@ -201,6 +201,7 @@ export default class EditForm extends AbstractStatefulView {
   _restoreHandlers() {
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setRollupClickHandler(this._callback.rollupClick);
+    this.setDeleteClickHandler(this._callback.deleteClick);
     this.setTypeChangeHandler();
     this.setDestinationChangeHandler();
     this.setOffersChangeHandler();
@@ -217,6 +218,14 @@ export default class EditForm extends AbstractStatefulView {
     const rollupBtn = this.element.querySelector('.event__rollup-btn');
     if (rollupBtn) {
       rollupBtn.addEventListener('click', this.#rollupClickHandler);
+    }
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    const deleteBtn = this.element.querySelector('.event__reset-btn');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', this.#deleteClickHandler);
     }
   }
 
@@ -267,6 +276,19 @@ export default class EditForm extends AbstractStatefulView {
     });
   }
 
+  getData() {
+    return {
+      id: this._point.id,
+      type: this._state.type,
+      destination: this._state.destination,
+      basePrice: parseInt(this._state.basePrice, 10),
+      dateFrom: this._state.dateFrom,
+      dateTo: this._state.dateTo,
+      offers: this._state.offers,
+      isFavorite: this._point.isFavorite
+    };
+  }
+
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this._callback.formSubmit();
@@ -275,6 +297,11 @@ export default class EditForm extends AbstractStatefulView {
   #rollupClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.rollupClick();
+  };
+
+  #deleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick();
   };
 
   #typeChangeHandler = (evt) => {
