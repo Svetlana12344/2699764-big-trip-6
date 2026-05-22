@@ -15,17 +15,13 @@ export const adaptPointToClient = (point) => {
   return adaptedPoint;
 };
 
-export const adaptDestinationToClient = (destination) => {
-  return {
-    ...destination,
-  };
-};
+export const adaptDestinationToClient = (destination) => ({
+  ...destination,
+});
 
-export const adaptOfferToClient = (offer) => {
-  return {
-    ...offer,
-  };
-};
+export const adaptOfferToClient = (offer) => ({
+  ...offer,
+});
 
 export const adaptOffersToClient = (offers) => {
   const adaptedOffers = {};
