@@ -1,3 +1,5 @@
+import { adaptPointToClient } from '../utils/adapter-utils.js';
+
 export default class PointsModel {
   #points = [];
   #api = null;

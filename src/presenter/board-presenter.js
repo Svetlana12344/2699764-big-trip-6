@@ -159,7 +159,7 @@ export default class BoardPresenter {
       }
       this.resetAllPointsView();
     } catch (error) {
-      console.error('Failed to update point:', error);
+      //console.error('Failed to update point:', error);
     }
   }
 
@@ -226,7 +226,7 @@ export default class BoardPresenter {
       this.resetAllPointsView();
       this.renderPoints();
     } catch (error) {
-      console.error('Failed to add point:', error);
+      //console.error('Failed to add point:', error);
     }
   }
 

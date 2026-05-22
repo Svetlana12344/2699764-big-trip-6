@@ -1,10 +1,7 @@
-const AUTHORIZATION = 'Basic bigtrip123456789';
-const END_POINT = 'https://21.objects.pages.academy/big-trip';
-
 export default class Api {
-  constructor(endPoint, authorization) {
-    this._endPoint = endPoint;
-    this._authorization = authorization;
+  constructor() {
+    this._endPoint = 'https://21.objects.pages.academy/big-trip';
+    this._authorization = 'Basic bigtrip123456789';
   }
 
   _load(url, options = {}) {
