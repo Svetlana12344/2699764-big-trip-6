@@ -1,9 +1,11 @@
 import Sorting from '../view/sorting-view.js';
 import EmptyPoints from '../view/empty-points-view.js';
 import LoadingView from '../view/loading-view.js';
+import TripInfoView from '../view/trip-info-view.js';
 import PointPresenter, { UserAction } from './point-presenter.js';
 import { sortPointsByDay, sortPointsByTime, sortPointsByPrice, SortType } from '../utils/sort-utils.js';
 import { filter } from '../utils/filter-utils.js';
+import { formatRoute, formatDates, calculateTotalPrice } from '../utils/trip-utils.js';
 
 const EMPTY_MESSAGES = {
   'everything': 'Click New Event to create your first point',
@@ -20,6 +22,7 @@ export default class BoardPresenter {
     this.offersModel = offersModel;
     this.onNewPointDestroy = onNewPointDestroy;
     this.boardContainer = document.querySelector('.trip-events');
+    this.tripInfoContainer = document.querySelector('.trip-main__trip-info');
     this.eventsList = null;
     this.pointPresenters = new Map();
     this.currentOpenPoint = null;
@@ -28,9 +31,11 @@ export default class BoardPresenter {
     this.isNewPointCreating = false;
     this.isLoading = true;
     this.loadingComponent = null;
+    this.tripInfoComponent = null;
   }
 
   async init() {
+    this.renderTripInfo();
     this.renderLoading();
     await this.pointsModel.init();
     await this.destinationsModel.init();
@@ -39,8 +44,48 @@ export default class BoardPresenter {
     this.renderSorting();
     this.createEventsList();
     this.renderPoints();
-    this.pointsModel.addObserver(() => this.renderPoints());
+    this.updateTripInfo();
+    this.pointsModel.addObserver(() => {
+      this.renderPoints();
+      this.updateTripInfo();
+    });
     this.filterModel.addObserver(() => this.renderPoints());
+  }
+
+  renderTripInfo() {
+    if (!this.tripInfoContainer) {
+      this.tripInfoContainer = document.querySelector('.trip-main__trip-info');
+      if (!this.tripInfoContainer) {
+        const tripMain = document.querySelector('.trip-main');
+        this.tripInfoContainer = document.createElement('div');
+        this.tripInfoContainer.className = 'trip-main__trip-info trip-info';
+        tripMain.prepend(this.tripInfoContainer);
+      }
+    }
+
+    if (this.tripInfoComponent) {
+      this.tripInfoComponent.removeElement();
+    }
+
+    this.tripInfoComponent = new TripInfoView();
+    this.tripInfoContainer.innerHTML = '';
+    this.tripInfoContainer.appendChild(this.tripInfoComponent.element);
+  }
+
+  updateTripInfo() {
+    const points = this.pointsModel.getPoints();
+    const destinations = this.destinationsModel.getDestinations();
+
+    if (points.length === 0) {
+      this.tripInfoComponent.updateInfo('', '', 0);
+      return;
+    }
+
+    const route = formatRoute(points, destinations);
+    const dates = formatDates(points);
+    const totalPrice = calculateTotalPrice(points, this.offersModel);
+
+    this.tripInfoComponent.updateInfo(route, dates, totalPrice);
   }
 
   renderLoading() {
@@ -158,6 +203,7 @@ export default class BoardPresenter {
       await this.pointsModel.updatePoint(updatedPoint);
       this.resetAllPointsView();
     }
+    this.updateTripInfo();
   }
 
   handleModeChange() {
@@ -221,6 +267,13 @@ export default class BoardPresenter {
     this.destroyNewPoint();
     this.resetAllPointsView();
     this.renderPoints();
+    this.updateTripInfo();
+  }
+
+  handleNewPointModeChange() {
+    if (this.currentOpenPoint && this.currentOpenPoint.isNew) {
+      this.currentOpenPoint.resetView();
+    }
   }
 
   destroyNewPoint() {

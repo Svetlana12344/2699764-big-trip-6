@@ -1,8 +1,9 @@
 import Filters from '../view/filters-view.js';
 
 export default class FilterPresenter {
-  constructor({ filterModel, onFilterChange }) {
+  constructor({ filterModel, pointsModel, onFilterChange }) {
     this.filterModel = filterModel;
+    this.pointsModel = pointsModel;
     this.onFilterChange = onFilterChange;
     this.filterComponent = null;
     this.container = document.querySelector('.trip-controls__filters');
@@ -11,6 +12,8 @@ export default class FilterPresenter {
   init() {
     this.renderFilters();
     this.filterModel.addObserver(() => this.handleModelChange());
+    this.pointsModel.addObserver(() => this.updateFilterAvailability());
+    this.updateFilterAvailability();
   }
 
   renderFilters() {
@@ -29,7 +32,13 @@ export default class FilterPresenter {
 
   handleModelChange() {
     const currentFilter = this.filterModel.getFilter();
-    this.filterComponent.updateFilter(currentFilter);
+    const filterAvailability = this.filterModel.getFilterAvailability();
+    this.filterComponent.updateFilter(currentFilter, filterAvailability);
     this.onFilterChange();
+  }
+
+  updateFilterAvailability() {
+    const points = this.pointsModel.getPoints();
+    this.filterModel.updateFilterAvailability(points);
   }
 }
