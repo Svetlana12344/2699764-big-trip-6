@@ -24,6 +24,7 @@ const boardPresenter = new BoardPresenter({
 
 const filterPresenter = new FilterPresenter({
   filterModel: filterModel,
+  pointsModel: pointsModel,
   onFilterChange: () => {
     boardPresenter.renderPoints();
   }
