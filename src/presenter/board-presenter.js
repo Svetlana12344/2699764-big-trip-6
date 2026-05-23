@@ -1,7 +1,7 @@
 import Sorting from '../view/sorting-view.js';
 import EmptyPoints from '../view/empty-points-view.js';
 import LoadingView from '../view/loading-view.js';
-import PointPresenter from './point-presenter.js';
+import PointPresenter, { UserAction } from './point-presenter.js';
 import { sortPointsByDay, sortPointsByTime, sortPointsByPrice, SortType } from '../utils/sort-utils.js';
 import { filter } from '../utils/filter-utils.js';
 
@@ -151,15 +151,12 @@ export default class BoardPresenter {
   }
 
   async handlePointChange(updatedPoint, action) {
-    try {
-      if (action === 'DELETE') {
-        await this.pointsModel.deletePoint(updatedPoint.id);
-      } else {
-        await this.pointsModel.updatePoint(updatedPoint);
-      }
+    if (action === UserAction.DELETE) {
+      await this.pointsModel.deletePoint(updatedPoint.id);
       this.resetAllPointsView();
-    } catch (error) {
-      //console.error('Failed to update point:', error);
+    } else if (action === UserAction.UPDATE) {
+      await this.pointsModel.updatePoint(updatedPoint);
+      this.resetAllPointsView();
     }
   }
 
@@ -215,25 +212,15 @@ export default class BoardPresenter {
   }
 
   async handleNewPointChange(updatedPoint, action) {
-    if (action === 'DELETE') {
+    if (action === UserAction.DELETE) {
       this.destroyNewPoint();
       return;
     }
 
-    try {
-      await this.pointsModel.addPoint(updatedPoint);
-      this.destroyNewPoint();
-      this.resetAllPointsView();
-      this.renderPoints();
-    } catch (error) {
-      //console.error('Failed to add point:', error);
-    }
-  }
-
-  handleNewPointModeChange() {
-    if (this.currentOpenPoint && this.currentOpenPoint.isNew) {
-      this.currentOpenPoint.resetView();
-    }
+    await this.pointsModel.addPoint(updatedPoint);
+    this.destroyNewPoint();
+    this.resetAllPointsView();
+    this.renderPoints();
   }
 
   destroyNewPoint() {
