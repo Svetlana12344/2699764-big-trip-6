@@ -250,6 +250,50 @@ export default class EditForm extends AbstractStatefulView {
     });
   }
 
+  setSavingState() {
+    const saveBtn = this.element.querySelector('.event__save-btn');
+    if (saveBtn) {
+      saveBtn.textContent = 'Saving...';
+      saveBtn.disabled = true;
+    }
+    const deleteBtn = this.element.querySelector('.event__reset-btn');
+    if (deleteBtn && deleteBtn.textContent === 'Delete') {
+      deleteBtn.disabled = true;
+    }
+  }
+
+  setDeletingState() {
+    const deleteBtn = this.element.querySelector('.event__reset-btn');
+    if (deleteBtn && deleteBtn.textContent === 'Delete') {
+      deleteBtn.textContent = 'Deleting...';
+      deleteBtn.disabled = true;
+    }
+    const saveBtn = this.element.querySelector('.event__save-btn');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+    }
+  }
+
+  setDefaultState() {
+    const saveBtn = this.element.querySelector('.event__save-btn');
+    if (saveBtn) {
+      saveBtn.textContent = 'Save';
+      saveBtn.disabled = false;
+    }
+    const deleteBtn = this.element.querySelector('.event__reset-btn');
+    if (deleteBtn && deleteBtn.textContent === 'Deleting...') {
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.disabled = false;
+    }
+  }
+
+  shake() {
+    this.element.style.animation = 'shake 0.5s';
+    setTimeout(() => {
+      this.element.style.animation = '';
+    }, 500);
+  }
+
   initDatepickers() {
     const startDateInput = this.element.querySelector('[data-date-type="start"]');
     const endDateInput = this.element.querySelector('[data-date-type="end"]');

@@ -18,6 +18,7 @@ export default class PointPresenter {
     this.routePointComponent = null;
     this.editFormComponent = null;
     this.isEditMode = false;
+    this.isSaving = false;
   }
 
   init() {
@@ -56,29 +57,67 @@ export default class PointPresenter {
       isNew: this.isNew
     });
 
-    this.editFormComponent.setFormSubmitHandler(() => {
-      this.handleFormSubmit();
+    this.editFormComponent.setFormSubmitHandler(async () => {
+      await this.handleFormSubmit();
     });
 
     this.editFormComponent.setRollupClickHandler(() => {
-      this.replaceToRoutePoint();
+      if (!this.isSaving) {
+        this.replaceToRoutePoint();
+      }
     });
 
-    this.editFormComponent.setDeleteClickHandler(() => {
-      this.onDataChange(this.point, UserAction.DELETE);
+    this.editFormComponent.setDeleteClickHandler(async () => {
+      await this.handleDeleteClick();
     });
 
     return this.editFormComponent.element;
   }
 
-  handleFormSubmit() {
+  async handleFormSubmit() {
+    if (this.isSaving) {
+      return;
+    }
+
+    this.isSaving = true;
+    this.editFormComponent.setSavingState();
+
     const formData = this.editFormComponent.getData();
-    this.onDataChange(formData, UserAction.UPDATE);
-    this.replaceToRoutePoint();
+
+    try {
+      if (this.isNew) {
+        await this.onDataChange(formData, UserAction.CREATE);
+      } else {
+        await this.onDataChange(formData, UserAction.UPDATE);
+      }
+      this.replaceToRoutePoint();
+    } catch (error) {
+      this.editFormComponent.shake();
+    } finally {
+      this.isSaving = false;
+      this.editFormComponent.setDefaultState();
+    }
+  }
+
+  async handleDeleteClick() {
+    if (this.isSaving) {
+      return;
+    }
+
+    this.isSaving = true;
+    this.editFormComponent.setDeletingState();
+
+    try {
+      await this.onDataChange(this.point, UserAction.DELETE);
+    } catch (error) {
+      this.editFormComponent.shake();
+      this.isSaving = false;
+      this.editFormComponent.setDefaultState();
+    }
   }
 
   replaceToEditForm() {
-    if (this.isEditMode) {
+    if (this.isEditMode || this.isSaving) {
       return;
     }
 
@@ -88,7 +127,7 @@ export default class PointPresenter {
     this.routePointComponent.element.replaceWith(editFormElement);
 
     const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape') {
+      if (evt.key === 'Escape' && !this.isSaving) {
         if (this.isNew) {
           this.onDataChange(null, UserAction.DELETE);
         } else {
@@ -118,7 +157,7 @@ export default class PointPresenter {
   }
 
   resetView() {
-    if (this.isEditMode) {
+    if (this.isEditMode && !this.isSaving) {
       this.replaceToRoutePoint();
     }
   }
@@ -134,7 +173,7 @@ export default class PointPresenter {
 
   update(point) {
     this.point = point;
-    if (this.isEditMode) {
+    if (this.isEditMode && !this.isSaving) {
       this.replaceToRoutePoint();
     }
     this.renderRoutePoint();
