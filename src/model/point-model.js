@@ -33,7 +33,7 @@ export default class PointsModel {
       }
       this.#notifyObservers();
     } catch (error) {
-      throw new Error('Не удалось обновить точку');
+      throw new Error('Failed to update point');
     }
   }
 
@@ -44,7 +44,7 @@ export default class PointsModel {
       this.#points = [adaptedPoint, ...this.#points];
       this.#notifyObservers();
     } catch (error) {
-      throw new Error('Не удалось добавить точку');
+      throw new Error('Failed to add point');
     }
   }
 
@@ -57,7 +57,7 @@ export default class PointsModel {
       }
       this.#notifyObservers();
     } catch (error) {
-      throw new Error('Не удалось удалить точку');
+      throw new Error('Failed to delete point');
     }
   }
 

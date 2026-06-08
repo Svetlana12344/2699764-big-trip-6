@@ -1,11 +1,5 @@
 import dayjs from 'dayjs';
 
-export const SortType = {
-  DAY: 'day',
-  TIME: 'time',
-  PRICE: 'price'
-};
-
 export const sortPointsByDay = (pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
 
 export const sortPointsByTime = (pointA, pointB) => {

@@ -1,28 +1,26 @@
-import { DESTINATIONS } from '../const.js';
+import { ALL_DESTINATIONS } from '../const.js';
 import { getRandomArrayItem, generateId } from '../utils/common-utils.js';
 
-const DESCRIPTION = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.';
+const DEFAULT_DESCRIPTION = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.';
+const DEFAULT_PHOTO_DESCRIPTION = 'Event photo';
+const DEFAULT_PHOTOS_COUNT = 3;
 
-function getRandomPhotos(count = 3) {
-  return Array.from({ length: count }, (_, index) => ({
-    src: `https://loremflickr.com/248/152?random=${index}`,
-    description: 'Event photo'
-  }));
-}
+const getRandomPhotos = (count = DEFAULT_PHOTOS_COUNT) => Array.from({ length: count }, (_, index) => ({
+  src: `https://loremflickr.com/248/152?random=${index}`,
+  description: DEFAULT_PHOTO_DESCRIPTION
+}));
 
-function generateDestination() {
-  const city = getRandomArrayItem(DESTINATIONS);
+const generateDestination = () => {
+  const city = getRandomArrayItem(ALL_DESTINATIONS);
   return {
     id: generateId(),
     name: city,
-    description: DESCRIPTION,
+    description: DEFAULT_DESCRIPTION,
     pictures: getRandomPhotos()
   };
-}
+};
 
-function generateDestinations() {
-  return DESTINATIONS.map(() => generateDestination());
-}
+const generateDestinations = () => ALL_DESTINATIONS.map(() => generateDestination());
 
 export { generateDestination, generateDestinations };
 

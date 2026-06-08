@@ -6,13 +6,9 @@ export const adaptPointToClient = (point) => ({
   isFavorite: point.is_favorite,
 });
 
-export const adaptDestinationToClient = (destination) => ({
-  ...destination,
-});
+export const adaptDestinationToClient = (destination) => destination;
 
-export const adaptOfferToClient = (offer) => ({
-  ...offer,
-});
+export const adaptOfferToClient = (offer) => offer;
 
 export const adaptOffersToClient = (offers) => {
   const adaptedOffers = {};

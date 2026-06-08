@@ -1,11 +1,5 @@
 import dayjs from 'dayjs';
-
-export const FilterType = {
-  EVERYTHING: 'everything',
-  FUTURE: 'future',
-  PRESENT: 'present',
-  PAST: 'past'
-};
+import { FilterType } from '../const.js';
 
 export const filter = {
   [FilterType.EVERYTHING]: (points) => [...points],
