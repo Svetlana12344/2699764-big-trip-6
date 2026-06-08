@@ -1,14 +1,15 @@
 import AbstractView from './abstract-view.js';
-
-const createEmptyPointsTemplate = (message) => `<p class="trip-events__msg">${message}</p>`;
+import he from 'he';
 
 export default class EmptyPoints extends AbstractView {
+  #message = '';
+
   constructor(message) {
     super();
-    this.message = message;
+    this.#message = message;
   }
 
   get template() {
-    return createEmptyPointsTemplate(this.message);
+    return `<p class="trip-events__msg">${he.encode(this.#message)}</p>`;
   }
 }

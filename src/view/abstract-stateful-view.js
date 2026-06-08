@@ -5,7 +5,7 @@ export default class AbstractStatefulView extends AbstractView {
 
   constructor() {
     super();
-    this._state = {};
+    this.#state = {};
   }
 
   get state() {
@@ -14,10 +14,14 @@ export default class AbstractStatefulView extends AbstractView {
 
   set state(newState) {
     this.#state = newState;
-    this.updateElement();
+    this.#rerender();
   }
 
-  updateElement() {
+  updateState(update) {
+    this.state = { ...this.#state, ...update };
+  }
+
+  #rerender() {
     const prevElement = this.element;
     const parent = prevElement.parentElement;
     this.removeElement();
@@ -29,10 +33,6 @@ export default class AbstractStatefulView extends AbstractView {
     }
 
     this._restoreHandlers();
-  }
-
-  updateState(update) {
-    this.state = { ...this.#state, ...update };
   }
 
   _restoreHandlers() {

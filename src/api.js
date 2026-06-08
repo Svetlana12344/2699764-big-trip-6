@@ -1,14 +1,15 @@
-export default class Api {
-  constructor() {
-    this._endPoint = 'https://21.objects.pages.academy/big-trip';
-    this._authorization = 'Basic bigtrip123456789';
-  }
+const SERVER_URL = 'https://24.objects.htmlacademy.pro/big-trip';
+const AUTH_CREDENTIALS = 'Basic bigtrip123456789';
 
-  _load(url, options = {}) {
-    return fetch(`${this._endPoint}/${url}`, {
+export default class Api {
+  #endPoint = SERVER_URL;
+  #authorization = AUTH_CREDENTIALS;
+
+  #load(url, options = {}) {
+    return fetch(`${this.#endPoint}/${url}`, {
       ...options,
       headers: {
-        'Authorization': this._authorization,
+        'Authorization': this.#authorization,
         'Content-Type': 'application/json',
         ...options.headers,
       },
@@ -22,39 +23,39 @@ export default class Api {
   }
 
   getPoints() {
-    return this._load('points');
+    return this.#load('points');
   }
 
   getDestinations() {
-    return this._load('destinations');
+    return this.#load('destinations');
   }
 
   getOffers() {
-    return this._load('offers');
+    return this.#load('offers');
   }
 
   updatePoint(point) {
-    return this._load(`points/${point.id}`, {
+    return this.#load(`points/${point.id}`, {
       method: 'PUT',
-      body: JSON.stringify(this._adaptToServer(point)),
+      body: JSON.stringify(this.#serializeToServer(point)),
     });
   }
 
   addPoint(point) {
-    return this._load('points', {
+    return this.#load('points', {
       method: 'POST',
-      body: JSON.stringify(this._adaptToServer(point)),
+      body: JSON.stringify(this.#serializeToServer(point)),
     });
   }
 
   deletePoint(pointId) {
-    return this._load(`points/${pointId}`, {
+    return this.#load(`points/${pointId}`, {
       method: 'DELETE',
     });
   }
 
-  _adaptToServer(point) {
-    const adaptedPoint = {
+  #serializeToServer(point) {
+    const serializedPoint = {
       ...point,
       'base_price': point.basePrice,
       'date_from': point.dateFrom,
@@ -62,12 +63,12 @@ export default class Api {
       'is_favorite': point.isFavorite,
     };
 
-    delete adaptedPoint.basePrice;
-    delete adaptedPoint.dateFrom;
-    delete adaptedPoint.dateTo;
-    delete adaptedPoint.isFavorite;
-    delete adaptedPoint.destination;
+    delete serializedPoint.basePrice;
+    delete serializedPoint.dateFrom;
+    delete serializedPoint.dateTo;
+    delete serializedPoint.isFavorite;
+    delete serializedPoint.destination;
 
-    return adaptedPoint;
+    return serializedPoint;
   }
 }

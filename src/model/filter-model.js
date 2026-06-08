@@ -1,9 +1,5 @@
-export const FilterType = {
-  EVERYTHING: 'everything',
-  FUTURE: 'future',
-  PRESENT: 'present',
-  PAST: 'past'
-};
+import dayjs from 'dayjs';
+import { FilterType } from '../const.js';
 
 export default class FilterModel {
   #currentFilter = FilterType.EVERYTHING;
@@ -32,12 +28,23 @@ export default class FilterModel {
   }
 
   updateFilterAvailability(points) {
-    const now = new Date();
-    const hasFuture = points.some((point) => new Date(point.dateFrom) > now);
+    if (!points || points.length === 0) {
+      this.#filterAvailability = {
+        [FilterType.EVERYTHING]: false,
+        [FilterType.FUTURE]: false,
+        [FilterType.PRESENT]: false,
+        [FilterType.PAST]: false
+      };
+      this.#notifyObservers();
+      return;
+    }
+
+    const now = dayjs();
+    const hasFuture = points.some((point) => dayjs(point.dateFrom).isAfter(now));
     const hasPresent = points.some((point) =>
-      new Date(point.dateFrom) <= now && new Date(point.dateTo) >= now
+      dayjs(point.dateFrom).isBefore(now) && dayjs(point.dateTo).isAfter(now)
     );
-    const hasPast = points.some((point) => new Date(point.dateTo) < now);
+    const hasPast = points.some((point) => dayjs(point.dateTo).isBefore(now));
 
     this.#filterAvailability = {
       [FilterType.EVERYTHING]: points.length > 0,
@@ -47,9 +54,8 @@ export default class FilterModel {
     };
 
     if (!this.#filterAvailability[this.#currentFilter]) {
-      this.setFilter(FilterType.EVERYTHING);
+      this.#currentFilter = FilterType.EVERYTHING;
     }
-
     this.#notifyObservers();
   }
 

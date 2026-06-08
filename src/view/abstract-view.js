@@ -1,8 +1,10 @@
+import he from 'he';
+
 export default class AbstractView {
   #element = null;
+  _callback = {};
 
   constructor() {
-    this._callback = {};
     if (new.target === AbstractView) {
       throw new Error('Can\'t instantiate AbstractView, only concrete one.');
     }
@@ -10,7 +12,7 @@ export default class AbstractView {
 
   get element() {
     if (!this.#element) {
-      this.#element = this.createElement(this.template);
+      this.#element = this.#createElement(this.template);
     }
     return this.#element;
   }
@@ -19,7 +21,7 @@ export default class AbstractView {
     throw new Error('You have to implement template getter');
   }
 
-  createElement(template) {
+  #createElement(template) {
     const newElement = document.createElement('div');
     newElement.innerHTML = template;
     return newElement.firstElementChild;
@@ -27,5 +29,9 @@ export default class AbstractView {
 
   removeElement() {
     this.#element = null;
+  }
+
+  _escape(str) {
+    return he.encode(str);
   }
 }

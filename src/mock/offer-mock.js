@@ -1,36 +1,41 @@
-import { OFFER_TYPES } from '../const.js';
+import { ALL_OFFER_TYPES } from '../const.js';
 import { getRandomInt, generateId } from '../utils/common-utils.js';
 
-const OFFER_PRICES = {
-  luggage: 30,
-  comfort: 100,
-  meal: 15,
-  seats: 5,
-  train: 40
+const OfferPrice = {
+  LUGGAGE: 30,
+  COMFORT: 100,
+  MEAL: 15,
+  SEATS: 5,
+  TRAIN: 40
 };
 
-const OFFER_TITLES = {
-  luggage: 'Add luggage',
-  comfort: 'Switch to comfort class',
-  meal: 'Add meal',
-  seats: 'Choose seats',
-  train: 'Travel by train'
+const OfferTitle = {
+  LUGGAGE: 'Add luggage',
+  COMFORT: 'Switch to comfort class',
+  MEAL: 'Add meal',
+  SEATS: 'Choose seats',
+  TRAIN: 'Travel by train'
 };
 
-function generateOffer(type) {
+const RANDOM_SORT_BIAS = 0.5;
+const DEFAULT_OFFERS_MIN_COUNT = 1;
+const DEFAULT_OFFERS_MAX_COUNT = 3;
+
+const generateOffer = (type) => {
+  const upperCaseType = type.toUpperCase();
   return {
     id: generateId(),
-    title: OFFER_TITLES[type],
-    price: OFFER_PRICES[type],
+    title: OfferTitle[upperCaseType],
+    price: OfferPrice[upperCaseType],
     type: type,
-    accepted: Math.random() > 0.5
+    accepted: Math.random() > RANDOM_SORT_BIAS
   };
-}
+};
 
-function generateOffers(count = getRandomInt(1, 3)) {
-  const shuffledTypes = [...OFFER_TYPES].sort(() => 0.5 - Math.random());
+const generateOffers = (count = getRandomInt(DEFAULT_OFFERS_MIN_COUNT, DEFAULT_OFFERS_MAX_COUNT)) => {
+  const shuffledTypes = [...ALL_OFFER_TYPES].sort(() => RANDOM_SORT_BIAS - Math.random());
   const selectedTypes = shuffledTypes.slice(0, count);
   return selectedTypes.map((type) => generateOffer(type));
-}
+};
 
 export { generateOffer, generateOffers };

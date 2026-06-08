@@ -1,9 +1,12 @@
 import dayjs from 'dayjs';
+import he from 'he';
+
+const SEPARATOR = ' — ';
 
 export const formatRoute = (points, destinations) => {
   const uniqueDestinations = [...new Set(points.map((point) => {
     const destination = destinations.find((dest) => dest.id === point.destination);
-    return destination ? destination.name : '';
+    return destination ? he.encode(destination.name) : '';
   }).filter(Boolean))];
 
   if (uniqueDestinations.length === 0) {
@@ -11,10 +14,10 @@ export const formatRoute = (points, destinations) => {
   }
 
   if (uniqueDestinations.length <= 3) {
-    return uniqueDestinations.join(' &mdash; ');
+    return uniqueDestinations.join(SEPARATOR);
   }
 
-  return `${uniqueDestinations[0]} &mdash; ... &mdash; ${uniqueDestinations[uniqueDestinations.length - 1]}`;
+  return `${uniqueDestinations[0]} — ... — ${uniqueDestinations[uniqueDestinations.length - 1]}`;
 };
 
 export const formatDates = (points) => {
@@ -30,10 +33,10 @@ export const formatDates = (points) => {
   const endFormat = endDate.format('MMM D').toUpperCase();
 
   if (startDate.isSame(endDate, 'month')) {
-    return `${startDate.format('MMM D')} &mdash; ${endDate.format('D')}`.toUpperCase();
+    return `${startDate.format('MMM D')} — ${endDate.format('D')}`.toUpperCase();
   }
 
-  return `${startFormat} &mdash; ${endFormat}`;
+  return `${startFormat} — ${endFormat}`;
 };
 
 export const calculateTotalPrice = (points, offersModel) => {

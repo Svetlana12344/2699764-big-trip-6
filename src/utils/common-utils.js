@@ -1,25 +1,27 @@
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const RANDOM_SORT_BIAS = 0.5;
+const ID_SUBSTRING_START = 2;
+const ID_SUBSTRING_END = 9;
+const MIN_DAYS_OFFSET = 0;
+const MAX_DAYS_OFFSET = 30;
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
-function getRandomArrayItem(array) {
-  return array[Math.floor(Math.random() * array.length)];
-}
+const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-function getRandomSubarray(array, maxLength) {
+const getRandomArrayItem = (array) => array[Math.floor(Math.random() * array.length)];
+
+const getRandomSubarray = (array, maxLength) => {
   const length = getRandomInt(1, Math.min(maxLength, array.length));
-  const shuffled = [...array].sort(() => 0.5 - Math.random());
+  const shuffled = [...array].sort(() => RANDOM_SORT_BIAS - Math.random());
   return shuffled.slice(0, length);
-}
+};
 
-function generateId() {
-  return Math.random().toString(36).substring(2, 9);
-}
+const generateId = () => Math.random().toString(36).substring(ID_SUBSTRING_START, ID_SUBSTRING_END);
 
-function generateDate() {
+const generateDate = () => {
   const now = new Date();
-  const futureDate = new Date(now.getTime() + getRandomInt(0, 30) * 24 * 60 * 60 * 1000);
+  const daysOffset = getRandomInt(MIN_DAYS_OFFSET, MAX_DAYS_OFFSET);
+  const futureDate = new Date(now.getTime() + daysOffset * MILLISECONDS_PER_DAY);
   return futureDate.toISOString();
-}
+};
 
 export { getRandomInt, getRandomArrayItem, getRandomSubarray, generateId, generateDate };
