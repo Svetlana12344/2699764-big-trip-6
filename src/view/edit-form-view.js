@@ -78,8 +78,8 @@ export default class EditForm extends AbstractStatefulView {
         <h3 class="event__section-title event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
           ${currentOffers.map((offer) => {
-            const isChecked = offers && offers.some((selected) => selected.id === offer.id);
-            return `
+    const isChecked = offers && offers.some((selected) => selected.id === offer.id);
+    return `
               <div class="event__offer-selector">
                 <input
                   class="event__offer-checkbox visually-hidden"
@@ -96,7 +96,7 @@ export default class EditForm extends AbstractStatefulView {
                 </label>
               </div>
             `;
-          }).join('')}
+  }).join('')}
         </div>
       </section>
     ` : '';

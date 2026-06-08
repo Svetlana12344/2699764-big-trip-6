@@ -70,7 +70,7 @@ export default class BoardPresenter {
     });
 
     this.#filterModel.addObserver(() => {
-    this.forceUpdateByFilter();
+      this.forceUpdateByFilter();
     });
   }
 

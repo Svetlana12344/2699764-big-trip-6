@@ -26,11 +26,11 @@ export default class TripInfoView extends AbstractView {
     this.#route = route;
     this.#dates = dates;
     this.#totalPrice = totalPrice;
-    
+
     const prevElement = this.element;
     const parent = prevElement.parentElement;
     this.removeElement();
-    
+
     if (parent) {
       parent.replaceChild(this.element, prevElement);
     }

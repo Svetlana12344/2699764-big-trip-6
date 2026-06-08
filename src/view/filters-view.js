@@ -52,7 +52,7 @@ export default class Filters extends AbstractView {
   updateFilter(filter, filterAvailability) {
     this._currentFilter = filter;
     this._filterAvailability = filterAvailability;
-    
+
     const filters = ['everything', 'future', 'present', 'past'];
     filters.forEach((filterId) => {
       const input = this.element.querySelector(`#filter-${filterId}`);
@@ -68,7 +68,7 @@ export default class Filters extends AbstractView {
     const label = evt.target;
     const forId = label.getAttribute('for');
     const input = document.getElementById(forId);
-    
+
     if (input && !input.disabled) {
       input.checked = true;
       this._callback.filterChange(input.value);
