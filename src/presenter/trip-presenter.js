@@ -1,6 +1,6 @@
 import TripInfoView from '../view/trip-info-view.js';
 import { render, replace, remove } from '../framework/render.js';
-import { formatRoute, formatDates, calculateTotalPrice } from '../utils/trip-utils.js';
+import { formatRoute, calculateTotalPrice } from '../utils/trip-utils.js';
 
 export default class TripInfoPresenter {
   #container = null;
@@ -38,13 +38,20 @@ export default class TripInfoPresenter {
 
     const destinations = this.#pointsModel.getDestinations();
     const routePath = formatRoute(points, destinations);
-    const dateString = formatDates(points);
     const totalCost = calculateTotalPrice(points, this.#pointsModel);
+
+    const sortedPoints = [...points].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
+    const startDate = new Date(sortedPoints[0].dateFrom);
+    const endDate = new Date(sortedPoints[sortedPoints.length - 1].dateEnd);
 
     const oldComponent = this.#infoComponent;
 
-    this.#infoComponent = new TripInfoView();
-    this.#infoComponent.updateInfo(routePath, dateString, totalCost);
+    this.#infoComponent = new TripInfoView({
+      route: routePath,
+      startDate: startDate,
+      endDate: endDate,
+      totalCost: totalCost,
+    });
 
     if (!oldComponent) {
       render(this.#infoComponent, this.#container, 'afterbegin');
