@@ -1,4 +1,4 @@
-export const PointType = {
+const EventType = {
   TAXI: 'taxi',
   BUS: 'bus',
   TRAIN: 'train',
@@ -7,58 +7,57 @@ export const PointType = {
   FLIGHT: 'flight',
   CHECK_IN: 'check-in',
   SIGHTSEEING: 'sightseeing',
-  RESTAURANT: 'restaurant'
+  RESTAURANT: 'restaurant',
 };
 
-export const Destination = {
-  AMSTERDAM: 'Amsterdam',
-  GENEVA: 'Geneva',
-  CHAMONIX: 'Chamonix',
-  PARIS: 'Paris',
-  LONDON: 'London',
-  BERLIN: 'Berlin',
-  ROME: 'Rome',
-  BARCELONA: 'Barcelona'
+const UserAction = {
+  UPDATE_EVENT: 'UPDATE_EVENT',
+  ADD_EVENT: 'ADD_EVENT',
+  DELETE_EVENT: 'DELETE_EVENT',
 };
 
-export const OfferType = {
-  LUGGAGE: 'luggage',
-  COMFORT: 'comfort',
-  MEAL: 'meal',
-  SEATS: 'seats',
-  TRAIN: 'train'
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
-export const SortType = {
-  DAY: 'day',
-  TIME: 'time',
-  PRICE: 'price'
-};
-
-export const FilterType = {
+const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
   PRESENT: 'present',
-  PAST: 'past'
+  PAST: 'past',
 };
 
-export const UserAction = {
-  UPDATE_POINT: 'update_point',
-  ADD_POINT: 'add_point',
-  DELETE_POINT: 'delete_point'
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFER: 'offer',
 };
 
-export const UpdateType = {
-  PATCH: 'patch',
-  MINOR: 'minor',
-  MAJOR: 'major'
+const TimeLimit = {
+  UPDATE_DELAY: 350,
 };
 
-export const TimeLimit = {
-  LOWER_LIMIT: 350,
-  UPPER_LIMIT: 1000
+const Method = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
-export const ALL_TYPES = Object.values(PointType);
-export const ALL_DESTINATIONS = Object.values(Destination);
-export const ALL_OFFER_TYPES = Object.values(OfferType);
+const MAX_ROUTE_DESTINATIONS = 3;
+
+export {
+  EventType,
+  UserAction,
+  UpdateType,
+  FilterType,
+  SortType,
+  TimeLimit,
+  Method,
+  MAX_ROUTE_DESTINATIONS,
+};

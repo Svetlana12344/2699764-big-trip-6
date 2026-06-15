@@ -1,77 +1,84 @@
-import AbstractView from './abstract-view.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import { FilterType } from '../const.js';
 
-export default class Filters extends AbstractView {
-  _currentFilter = 'everything';
-  _filterAvailability = {
-    everything: true,
-    future: true,
-    present: true,
-    past: true
-  };
+const createFiltersTemplate = (currentFilter, availability) => {
+  const filterItems = [
+    { id: FilterType.EVERYTHING, label: 'Everything' },
+    { id: FilterType.FUTURE, label: 'Future' },
+    { id: FilterType.PRESENT, label: 'Present' },
+    { id: FilterType.PAST, label: 'Past' }
+  ];
 
-  get template() {
-    return this.#createFiltersTemplate();
-  }
+  const filtersHtml = filterItems.map((filter) => `
+    <div class="trip-filters__filter">
+      <input
+        id="filter-${filter.id}"
+        class="trip-filters__filter-input visually-hidden"
+        type="radio"
+        name="trip-filter"
+        value="${filter.id}"
+        ${currentFilter === filter.id ? 'checked' : ''}
+        ${!availability[filter.id] ? 'disabled' : ''}
+      >
+      <label class="trip-filters__filter-label" for="filter-${filter.id}">${filter.label}</label>
+    </div>
+  `).join('');
 
-  #createFiltersTemplate() {
-    const filters = [
-      { id: 'everything', label: 'Everything' },
-      { id: 'future', label: 'Future' },
-      { id: 'present', label: 'Present' },
-      { id: 'past', label: 'Past' }
-    ];
-
-    const filtersHtml = filters.map((filter) => `
-      <div class="trip-filters__filter">
-        <input
-          id="filter-${filter.id}"
-          class="trip-filters__filter-input visually-hidden"
-          type="radio"
-          name="trip-filter"
-          value="${filter.id}"
-          ${this._currentFilter === filter.id ? 'checked' : ''}
-          ${!this._filterAvailability[filter.id] ? 'disabled' : ''}
-        >
-        <label class="trip-filters__filter-label" for="filter-${filter.id}">${filter.label}</label>
-      </div>
-    `).join('');
-
-    return `<form class="trip-filters" action="#" method="get">
+  return `
+    <form class="trip-filters" action="#" method="get">
       ${filtersHtml}
       <button class="visually-hidden" type="submit">Accept filter</button>
-    </form>`;
+    </form>
+  `;
+};
+
+export default class FiltersView extends AbstractView {
+  #currentFilter = FilterType.EVERYTHING;
+  #filterAvailability = {
+    [FilterType.EVERYTHING]: true,
+    [FilterType.FUTURE]: true,
+    [FilterType.PRESENT]: true,
+    [FilterType.PAST]: true
+  };
+
+  #onFilterChange = null;
+
+  constructor(onFilterChange) {
+    super();
+    this.#onFilterChange = onFilterChange;
+    this.element.addEventListener('change', this.#handleFilterChange);
   }
 
-  setFilterChangeHandler(callback) {
-    this._callback.filterChange = callback;
-    this.element.querySelectorAll('.trip-filters__filter-label').forEach((label) => {
-      label.addEventListener('click', this.#labelClickHandler);
-    });
+  get template() {
+    return createFiltersTemplate(this.#currentFilter, this.#filterAvailability);
   }
 
-  updateFilter(filter, filterAvailability) {
-    this._currentFilter = filter;
-    this._filterAvailability = filterAvailability;
+  #handleFilterChange = (evt) => {
+    evt.preventDefault();
+    if (evt.target.tagName === 'INPUT') {
+      this.#onFilterChange(evt.target.value);
+    }
+  };
 
-    const filters = ['everything', 'future', 'present', 'past'];
-    filters.forEach((filterId) => {
-      const input = this.element.querySelector(`#filter-${filterId}`);
-      if (input) {
-        input.checked = (this._currentFilter === filterId);
-        input.disabled = !this._filterAvailability[filterId];
+  setDisabled(filterType, isDisabled) {
+    const input = this.element.querySelector(`input[value="${filterType}"]`);
+    if (input) {
+      input.disabled = isDisabled;
+    }
+  }
+
+  updateFilter(newFilter, availability) {
+    if (availability) {
+      this.#filterAvailability = availability;
+    }
+    this.#currentFilter = newFilter;
+
+    const inputs = this.element.querySelectorAll('input[type="radio"]');
+    inputs.forEach((input) => {
+      input.checked = input.value === newFilter;
+      if (availability) {
+        input.disabled = !availability[input.value];
       }
     });
   }
-
-  #labelClickHandler = (evt) => {
-    evt.preventDefault();
-    const label = evt.target;
-    const forId = label.getAttribute('for');
-    const input = document.getElementById(forId);
-
-    if (input && !input.disabled) {
-      input.checked = true;
-      this._callback.filterChange(input.value);
-    }
-  };
 }

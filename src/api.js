@@ -1,74 +1,66 @@
-const SERVER_URL = 'https://24.objects.htmlacademy.pro/big-trip';
-const AUTH_CREDENTIALS = 'Basic bigtrip123456789';
+import ApiService from './framework/api-service.js';
 
-export default class Api {
-  #endPoint = SERVER_URL;
-  #authorization = AUTH_CREDENTIALS;
+const HttpMethod = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
+};
 
-  #load(url, options = {}) {
-    return fetch(`${this.#endPoint}/${url}`, {
-      ...options,
-      headers: {
-        'Authorization': this.#authorization,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error(`Error: ${response.status}`);
-      });
+export default class TravelApi extends ApiService {
+  get points() {
+    return this._load({ url: 'points' }).then(ApiService.parseResponse);
   }
 
-  getPoints() {
-    return this.#load('points');
+  get destinations() {
+    return this._load({ url: 'destinations' }).then(ApiService.parseResponse);
   }
 
-  getDestinations() {
-    return this.#load('destinations');
+  get offers() {
+    return this._load({ url: 'offers' }).then(ApiService.parseResponse);
   }
 
-  getOffers() {
-    return this.#load('offers');
+  async updatePoint(point) {
+    const response = await this._load({
+      url: `points/${point.id}`,
+      method: HttpMethod.PUT,
+      body: JSON.stringify(this.#toServer(point)),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    });
+    return ApiService.parseResponse(response);
   }
 
-  updatePoint(point) {
-    return this.#load(`points/${point.id}`, {
-      method: 'PUT',
-      body: JSON.stringify(this.#serializeToServer(point)),
+  async addPoint(point) {
+    const adapted = this.#toServer(point);
+    const response = await this._load({
+      url: 'points',
+      method: HttpMethod.POST,
+      body: JSON.stringify(adapted),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    });
+    return ApiService.parseResponse(response);
+  }
+
+  async deletePoint(point) {
+    return this._load({
+      url: `points/${point.id}`,
+      method: HttpMethod.DELETE,
     });
   }
 
-  addPoint(point) {
-    return this.#load('points', {
-      method: 'POST',
-      body: JSON.stringify(this.#serializeToServer(point)),
-    });
-  }
-
-  deletePoint(pointId) {
-    return this.#load(`points/${pointId}`, {
-      method: 'DELETE',
-    });
-  }
-
-  #serializeToServer(point) {
-    const serializedPoint = {
+  #toServer(point) {
+    const adapted = {
       ...point,
       'base_price': point.basePrice,
       'date_from': point.dateFrom,
-      'date_to': point.dateTo,
+      'date_to': point.dateEnd,
       'is_favorite': point.isFavorite,
     };
-
-    delete serializedPoint.basePrice;
-    delete serializedPoint.dateFrom;
-    delete serializedPoint.dateTo;
-    delete serializedPoint.isFavorite;
-    delete serializedPoint.destination;
-
-    return serializedPoint;
+    delete adapted.basePrice;
+    delete adapted.dateFrom;
+    delete adapted.dateEnd;
+    delete adapted.isFavorite;
+    if (!adapted.id) delete adapted.id;
+    return adapted;
   }
 }

@@ -1,0 +1,93 @@
+import { render, remove } from '../framework/render.js';
+import EditForm from '../view/edit-form-view.js';
+import { EventType } from '../const.js';
+import { isEscapeKey } from '../utils/common-utils.js';
+
+export default class NewPointPresenter {
+  #eventListContainer = null;
+  #pointsModel = null;
+  #onClose = null;
+  #onSave = null;
+
+  #newPointComponent = null;
+
+  constructor({ eventListContainer, pointsModel, onClose, onSave }) {
+    this.#eventListContainer = eventListContainer;
+    this.#pointsModel = pointsModel;
+    this.#onClose = onClose;
+    this.#onSave = onSave;
+  }
+
+  init() {
+    if (this.#newPointComponent !== null) {
+      return;
+    }
+
+    const newPoint = {
+      type: EventType.FLIGHT,
+      destination: '',
+      dateFrom: '',
+      dateEnd: '',
+      basePrice: 0,
+      offers: [],
+      isFavorite: false,
+    };
+
+    this.#newPointComponent = new EditForm({
+      point: newPoint,
+      destinations: this.#pointsModel.getDestinations(),
+      allOffers: this.#pointsModel.getOffers(),
+      isNew: true
+    });
+
+    this.#newPointComponent.setFormSubmitHandler(async () => {
+      await this.#saveHandler();
+    });
+
+    this.#newPointComponent.setRollupClickHandler(() => {
+      this.#cancelHandler();
+    });
+
+    this.#newPointComponent.setDeleteClickHandler(() => {
+      this.#cancelHandler();
+    });
+
+    render(this.#newPointComponent, this.#eventListContainer, 'afterbegin');
+    document.addEventListener('keydown', this.#escKeydownHandler);
+  }
+
+  destroy() {
+    if (this.#newPointComponent === null) {
+      return;
+    }
+
+    remove(this.#newPointComponent);
+    this.#newPointComponent = null;
+
+    document.removeEventListener('keydown', this.#escKeydownHandler);
+  }
+
+  #escKeydownHandler = (evt) => {
+    if (isEscapeKey(evt)) {
+      evt.preventDefault();
+      this.#cancelHandler();
+    }
+  };
+
+  #cancelHandler = () => {
+    this.destroy();
+    this.#onClose?.();
+  };
+
+  #saveHandler = async () => {
+    const formData = this.#newPointComponent.getData();
+    this.#newPointComponent.setSavingState();
+    try {
+      await this.#onSave(formData);
+      this.destroy();
+    } catch (err) {
+      this.#newPointComponent.shake();
+      this.#newPointComponent.setDefaultState();
+    }
+  };
+}
