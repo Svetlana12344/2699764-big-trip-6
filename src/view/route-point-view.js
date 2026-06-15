@@ -82,11 +82,10 @@ export default class RoutePoint extends AbstractView {
     </li>`;
   }
 
-  // Привязываем обработчики после создания элемента в DOM
   setHandlers() {
     const rollupBtn = this.element.querySelector('.event__rollup-btn');
     const favoriteBtn = this.element.querySelector('.event__favorite-btn');
-    
+
     if (rollupBtn) {
       rollupBtn.addEventListener('click', this.#rollupClickHandler);
     }

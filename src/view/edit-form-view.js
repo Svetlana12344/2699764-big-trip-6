@@ -349,7 +349,6 @@ export default class EditForm extends StatefulComponent {
       : this._state.destination;
 
     return {
-      id: this._state.id,
       type: this._state.type,
       destination: destinationId,
       basePrice: parseInt(this._state.basePrice, 10),

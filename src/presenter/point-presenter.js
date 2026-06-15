@@ -93,25 +93,29 @@ export default class PointPresenter {
   }
 
   #openEdit = () => {
-    replace(this.#editComponent, this.#viewComponent);
-    document.addEventListener('keydown', this.#onEsc);
-    this.#onModeChange?.();
-    this.#currentMode = DisplayMode.EDIT;
+    requestAnimationFrame(() => {
+      replace(this.#editComponent, this.#viewComponent);
+      document.addEventListener('keydown', this.#onEsc);
+      this.#onModeChange?.();
+      this.#currentMode = DisplayMode.EDIT;
+    });
   };
 
   #closeEdit = () => {
-    replace(this.#viewComponent, this.#editComponent);
-    document.removeEventListener('keydown', this.#onEsc);
-    this.#editComponent = new EditForm({
-      point: this.#currentPoint,
-      destinations: this.#pointsModel.getDestinations(),
-      allOffers: this.#pointsModel.getOffers(),
-      isNew: false,
-      onFormSubmit: (updatedPoint) => this.#save(updatedPoint),
-      onCloseClick: () => this.#closeEdit(),
-      onDeleteClick: (pointToDelete) => this.#delete(pointToDelete),
+    requestAnimationFrame(() => {
+      replace(this.#viewComponent, this.#editComponent);
+      document.removeEventListener('keydown', this.#onEsc);
+      this.#editComponent = new EditForm({
+        point: this.#currentPoint,
+        destinations: this.#pointsModel.getDestinations(),
+        allOffers: this.#pointsModel.getOffers(),
+        isNew: false,
+        onFormSubmit: (updatedPoint) => this.#save(updatedPoint),
+        onCloseClick: () => this.#closeEdit(),
+        onDeleteClick: (pointToDelete) => this.#delete(pointToDelete),
+      });
+      this.#currentMode = DisplayMode.VIEW;
     });
-    this.#currentMode = DisplayMode.VIEW;
   };
 
   #onEsc = (event) => {

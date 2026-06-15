@@ -26,8 +26,8 @@ export default class NewPointPresenter {
     const newPoint = {
       type: EventType.FLIGHT,
       destination: '',
-      dateFrom: '',
-      dateEnd: '',
+      dateFrom: new Date().toISOString(),
+      dateEnd: new Date(Date.now() + 3600000).toISOString(),
       basePrice: 0,
       offers: [],
       isFavorite: false,
