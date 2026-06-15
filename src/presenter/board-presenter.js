@@ -64,7 +64,9 @@ export default class BoardPresenter {
   };
 
   #onSortChange = (sortType) => {
-    if (this.#currentSort === sortType) return;
+    if (this.#currentSort === sortType) {
+      return;
+    }
     this.#currentSort = sortType;
     this.#renderPoints();
   };
@@ -98,7 +100,9 @@ export default class BoardPresenter {
   };
 
   #onAddClick = () => {
-    if (this.#isCreating) return;
+    if (this.#isCreating) {
+      return;
+    }
 
     this.#filterModel.setFilter(FilterType.EVERYTHING);
     this.#currentSort = SortType.DAY;
@@ -171,7 +175,9 @@ export default class BoardPresenter {
       filterModel: this.#filterModel,
       pointsModel: this.#pointsModel,
       onFilterChange: this.#onFilterChange,
-      onSortReset: () => { this.#currentSort = SortType.DAY; },
+      onSortReset: () => {
+        this.#currentSort = SortType.DAY;
+      },
     });
     this.#filterController.init();
 
@@ -212,7 +218,9 @@ export default class BoardPresenter {
 
     const points = this.#getFilteredAndSorted();
 
-    if (this.#sortComponent) remove(this.#sortComponent);
+    if (this.#sortComponent) {
+      remove(this.#sortComponent);
+    }
     this.#sortComponent = new SortView(this.#currentSort, this.#onSortChange);
     render(this.#sortComponent, this.#tripEventsContainer, 'afterbegin');
 
@@ -269,8 +277,14 @@ export default class BoardPresenter {
   #clearAll() {
     this.#pointControllers.forEach((c) => c.destroy());
     this.#pointControllers.clear();
-    if (this.#emptyComponent) remove(this.#emptyComponent);
-    if (this.#loadingComponent) remove(this.#loadingComponent);
-    if (this.#errorComponent) remove(this.#errorComponent);
+    if (this.#emptyComponent) {
+      remove(this.#emptyComponent);
+    }
+    if (this.#loadingComponent) {
+      remove(this.#loadingComponent);
+    }
+    if (this.#errorComponent) {
+      remove(this.#errorComponent);
+    }
   }
 }

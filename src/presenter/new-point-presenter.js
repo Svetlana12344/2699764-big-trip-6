@@ -4,15 +4,15 @@ import { EventType } from '../const.js';
 import { isEscapeKey } from '../utils/common-utils.js';
 
 export default class NewPointPresenter {
-  #eventListContainer = null;
+  #container = null;
   #pointsModel = null;
   #onClose = null;
   #onSave = null;
 
   #newPointComponent = null;
 
-  constructor({ eventListContainer, pointsModel, onClose, onSave }) {
-    this.#eventListContainer = eventListContainer;
+  constructor({ container, pointsModel, onClose, onSave }) {
+    this.#container = container;
     this.#pointsModel = pointsModel;
     this.#onClose = onClose;
     this.#onSave = onSave;
@@ -52,7 +52,7 @@ export default class NewPointPresenter {
       this.#cancelHandler();
     });
 
-    render(this.#newPointComponent, this.#eventListContainer, 'afterbegin');
+    render(this.#newPointComponent, this.#container, 'afterbegin');
     document.addEventListener('keydown', this.#escKeydownHandler);
   }
 

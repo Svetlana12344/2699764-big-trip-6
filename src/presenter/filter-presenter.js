@@ -1,33 +1,32 @@
 import { render } from '../framework/render.js';
 import FiltersView from '../view/filters-view.js';
-import { FilterType } from '../const.js';
 
-export default class FilterController {
+export default class FilterPresenter {
   #container = null;
   #filterModel = null;
-  #tripsModel = null;
+  #pointsModel = null;
   #onFilterChange = null;
   #onSortReset = null;
 
-  #filterWidget = null;
+  #filterComponent = null;
 
   constructor({ filterContainer, filterModel, pointsModel, onFilterChange, onSortReset }) {
     this.#container = filterContainer;
     this.#filterModel = filterModel;
-    this.#tripsModel = pointsModel;
+    this.#pointsModel = pointsModel;
     this.#onFilterChange = onFilterChange;
     this.#onSortReset = onSortReset;
 
-    this.#filterModel.addObserver(this.#handleModelUpdate);
+    this.#filterModel.addObserver(this.#onModelUpdate);
   }
 
   init() {
-    this.#filterWidget = new FiltersView(this.#handleFilterSelect);
-    render(this.#filterWidget, this.#container);
-    this.#updateFiltersState();
+    const currentFilter = this.#filterModel.getFilter();
+    this.#filterComponent = new FiltersView(currentFilter, this.#onFilterSelect);
+    render(this.#filterComponent, this.#container);
   }
 
-  #handleFilterSelect = (filterType) => {
+  #onFilterSelect = (filterType) => {
     if (this.#filterModel.getFilter() === filterType) {
       return;
     }
@@ -36,40 +35,11 @@ export default class FilterController {
     this.#onFilterChange?.();
   };
 
-  #handleModelUpdate = () => {
-    if (this.#filterWidget) {
-      this.#filterWidget.updateFilter(this.#filterModel.getFilter());
-      this.#updateFiltersState();
-    }
+  #onModelUpdate = () => {
+    this.#filterComponent.updateFilter(this.#filterModel.getFilter());
   };
 
-  #updateFiltersState() {
-    if (!this.#tripsModel || !this.#filterWidget) return;
-    
-    const allTrips = this.#tripsModel.getPoints();
-    const currentTime = new Date();
-
-    if (!allTrips || allTrips.length === 0) {
-      return;
-    }
-
-    const hasFutureTrips = allTrips.some((trip) => new Date(trip.dateFrom) > currentTime);
-    const hasPresentTrips = allTrips.some((trip) => {
-      const startTime = new Date(trip.dateFrom);
-      const endTime = new Date(trip.dateEnd);
-      return startTime <= currentTime && endTime >= currentTime;
-    });
-    const hasPastTrips = allTrips.some((trip) => new Date(trip.dateEnd) < currentTime);
-
-    this.#filterWidget.setDisabled(FilterType.FUTURE, !hasFutureTrips);
-    this.#filterWidget.setDisabled(FilterType.PRESENT, !hasPresentTrips);
-    this.#filterWidget.setDisabled(FilterType.PAST, !hasPastTrips);
-    this.#filterWidget.setDisabled(FilterType.EVERYTHING, false);
-  }
-
   setFilterDisabled(filterType, isDisabled) {
-    if (this.#filterWidget) {
-      this.#filterWidget.setDisabled(filterType, isDisabled);
-    }
+    this.#filterComponent.setDisabled(filterType, isDisabled);
   }
 }

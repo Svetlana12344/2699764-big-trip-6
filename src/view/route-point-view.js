@@ -82,42 +82,25 @@ export default class RoutePoint extends AbstractView {
     </li>`;
   }
 
-  setRollupClickHandler(callback) {
-    this._callback.rollupClick = callback;
+  _restoreHandlers() {
     const rollupBtn = this.element.querySelector('.event__rollup-btn');
+    const favoriteBtn = this.element.querySelector('.event__favorite-btn');
+    
     if (rollupBtn) {
-      rollupBtn.removeEventListener('click', this.#rollupClickHandler);
       rollupBtn.addEventListener('click', this.#rollupClickHandler);
     }
-  }
-
-  setFavoriteClickHandler(callback) {
-    this._callback.favoriteClick = callback;
-    const favoriteBtn = this.element.querySelector('.event__favorite-btn');
     if (favoriteBtn) {
-      favoriteBtn.removeEventListener('click', this.#favoriteClickHandler);
       favoriteBtn.addEventListener('click', this.#favoriteClickHandler);
     }
   }
 
-  shake() {
-    this.element.style.animation = 'shake 0.5s';
-    setTimeout(() => {
-      this.element.style.animation = '';
-    }, 500);
-  }
-
   #rollupClickHandler = (evt) => {
     evt.preventDefault();
-    if (this._callback.rollupClick) {
-      this._callback.rollupClick();
-    }
+    this.#onRollupClick?.();
   };
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
-    if (this._callback.favoriteClick) {
-      this._callback.favoriteClick();
-    }
+    this.#onFavoriteClick?.();
   };
 }

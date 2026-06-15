@@ -1,4 +1,5 @@
 import Observable from '../framework/observable.js';
+import { UpdateType } from '../const.js';
 
 export default class PointsModel extends Observable {
   #apiService = null;
@@ -42,14 +43,13 @@ export default class PointsModel extends Observable {
       const serverPoints = await this.#apiService.points;
       this.#destinations = await this.#apiService.destinations;
       this.#offers = await this.#apiService.offers;
-
       this.#points = serverPoints.map(this.#adaptToClient);
-      this._notify('INIT', { isError: false });
+      this._notify(UpdateType.INIT, { isError: false });
     } catch (err) {
       this.#points = [];
       this.#destinations = [];
       this.#offers = [];
-      this._notify('INIT', { isError: true });
+      this._notify(UpdateType.INIT, { isError: true });
     }
   }
 
@@ -58,7 +58,6 @@ export default class PointsModel extends Observable {
     if (index === -1) {
       throw new Error('Cannot update non-existent point');
     }
-
     try {
       const response = await this.#apiService.updatePoint(update);
       const updatedPoint = this.#adaptToClient(response);
@@ -89,7 +88,6 @@ export default class PointsModel extends Observable {
     if (index === -1) {
       throw new Error('Cannot delete non-existent point');
     }
-
     try {
       await this.#apiService.deletePoint(update);
       this.#points = [

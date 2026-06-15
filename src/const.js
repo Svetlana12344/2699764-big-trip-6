@@ -1,4 +1,4 @@
-const EventType = {
+export const EventType = {
   TAXI: 'taxi',
   BUS: 'bus',
   TRAIN: 'train',
@@ -10,27 +10,27 @@ const EventType = {
   RESTAURANT: 'restaurant',
 };
 
-const UserAction = {
+export const UserAction = {
   UPDATE_EVENT: 'UPDATE_EVENT',
   ADD_EVENT: 'ADD_EVENT',
   DELETE_EVENT: 'DELETE_EVENT',
 };
 
-const UpdateType = {
+export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT',
 };
 
-const FilterType = {
+export const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
   PRESENT: 'present',
   PAST: 'past',
 };
 
-const SortType = {
+export const SortType = {
   DAY: 'day',
   EVENT: 'event',
   TIME: 'time',
@@ -38,26 +38,15 @@ const SortType = {
   OFFER: 'offer',
 };
 
-const TimeLimit = {
+export const TimeLimit = {
   UPDATE_DELAY: 350,
 };
 
-const Method = {
+export const Method = {
   GET: 'GET',
   PUT: 'PUT',
   POST: 'POST',
   DELETE: 'DELETE',
 };
 
-const MAX_ROUTE_DESTINATIONS = 3;
-
-export {
-  EventType,
-  UserAction,
-  UpdateType,
-  FilterType,
-  SortType,
-  TimeLimit,
-  Method,
-  MAX_ROUTE_DESTINATIONS,
-};
+export const MAX_ROUTE_DESTINATIONS = 3;

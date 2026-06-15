@@ -193,6 +193,8 @@ const createFormTemplate = (state, destinationsList, allOffersList) => {
 };
 
 export default class EditForm extends StatefulComponent {
+  _callback = {};
+
   #currentPoint = null;
   #cityList = [];
   #serviceList = {};
@@ -206,6 +208,7 @@ export default class EditForm extends StatefulComponent {
 
   constructor({ point, destinations, allOffers, isNew = false, onFormSubmit, onCloseClick, onDeleteClick }) {
     super();
+    this._callback = {};
     this.#currentPoint = point;
     this.#cityList = destinations;
     this.#serviceList = allOffers;
@@ -277,6 +280,84 @@ export default class EditForm extends StatefulComponent {
       formElement.classList.remove('forced-shake-animation');
       callback?.();
     }, SHAKE_TIMEOUT);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    const form = this.element.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', this.#handleSubmit);
+    }
+  }
+
+  setRollupClickHandler(callback) {
+    this._callback.rollupClick = callback;
+    const rollupBtn = this.element.querySelector('.event__rollup-btn');
+    if (rollupBtn) {
+      rollupBtn.addEventListener('click', this.#handleClose);
+    }
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    const deleteBtn = this.element.querySelector('.event__reset-btn');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', this.#handleReset);
+    }
+  }
+
+  setSavingState() {
+    const saveBtn = this.element.querySelector('.event__save-btn');
+    if (saveBtn) {
+      saveBtn.textContent = 'Saving...';
+      saveBtn.disabled = true;
+    }
+    const deleteBtn = this.element.querySelector('.event__reset-btn');
+    if (deleteBtn && deleteBtn.textContent === 'Delete') {
+      deleteBtn.disabled = true;
+    }
+  }
+
+  setDeletingState() {
+    const deleteBtn = this.element.querySelector('.event__reset-btn');
+    if (deleteBtn && deleteBtn.textContent === 'Delete') {
+      deleteBtn.textContent = 'Deleting...';
+      deleteBtn.disabled = true;
+    }
+    const saveBtn = this.element.querySelector('.event__save-btn');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+    }
+  }
+
+  setDefaultState() {
+    const saveBtn = this.element.querySelector('.event__save-btn');
+    if (saveBtn) {
+      saveBtn.textContent = 'Save';
+      saveBtn.disabled = false;
+    }
+    const deleteBtn = this.element.querySelector('.event__reset-btn');
+    if (deleteBtn && deleteBtn.textContent === 'Deleting...') {
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.disabled = false;
+    }
+  }
+
+  getData() {
+    const destinationId = this._state.destination && typeof this._state.destination === 'object'
+      ? this._state.destination.id
+      : this._state.destination;
+
+    return {
+      id: this._state.id,
+      type: this._state.type,
+      destination: destinationId,
+      basePrice: parseInt(this._state.basePrice, 10),
+      dateFrom: this._state.dateFrom,
+      dateEnd: this._state.dateEnd,
+      offers: this._state.offers || [],
+      isFavorite: this._state.isFavorite || false
+    };
   }
 
   removeElement() {
@@ -373,19 +454,29 @@ export default class EditForm extends StatefulComponent {
       this.shakeElement();
       return;
     }
-    this.#onFormSend(EditForm.parseStateToData(this._state));
+    if (this._callback.formSubmit) {
+      this._callback.formSubmit();
+    } else if (this.#onFormSend) {
+      this.#onFormSend(EditForm.parseStateToData(this._state));
+    }
   };
 
   #handleClose = (event) => {
     event.preventDefault();
-    this.#onClosePanel();
+    if (this._callback.rollupClick) {
+      this._callback.rollupClick();
+    } else if (this.#onClosePanel) {
+      this.#onClosePanel();
+    }
   };
 
   #handleReset = (event) => {
     event.preventDefault();
-    if (this._state.id) {
+    if (this._callback.deleteClick) {
+      this._callback.deleteClick();
+    } else if (this._state.id && this.#onItemDelete) {
       this.#onItemDelete(EditForm.parseStateToData(this._state));
-    } else {
+    } else if (this.#onClosePanel) {
       this.#onClosePanel();
     }
   };

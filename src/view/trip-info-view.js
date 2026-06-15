@@ -1,11 +1,10 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { humanizeTripDate } from '../utils/date-utils.js';
 import he from 'he';
 
-const createTripInfoTemplate = (route, startDate, endDate, totalCost) => `
+const createTripInfoTemplate = (route, dates, totalCost) => `
   <div class="trip-info__main">
     <h1 class="trip-info__title">${he.encode(route)}</h1>
-    <p class="trip-info__dates">${route ? he.encode(startDate) : ''}</p>
+    <p class="trip-info__dates">${he.encode(dates)}</p>
   </div>
   <p class="trip-info__cost">
     Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalCost}</span>
@@ -14,8 +13,7 @@ const createTripInfoTemplate = (route, startDate, endDate, totalCost) => `
 
 export default class TripInfoView extends AbstractView {
   #routeText = '';
-  #startDate = null;
-  #endDate = null;
+  #datesString = '';
   #totalExpense = 0;
 
   constructor() {
@@ -23,21 +21,13 @@ export default class TripInfoView extends AbstractView {
   }
 
   get template() {
-    return createTripInfoTemplate(this.#routeText, this.#formatDates(), this.#totalExpense);
+    return createTripInfoTemplate(this.#routeText, this.#datesString, this.#totalExpense);
   }
 
-  #formatDates() {
-    if (!this.#startDate || !this.#endDate) {
-      return '';
-    }
-    return `${humanizeTripDate(this.#startDate)} — ${humanizeTripDate(this.#endDate)}`;
-  }
-
-  updateInfo(routeInfo, startTimestamp, endTimestamp, totalAmount) {
-    this.#routeText = routeInfo;
-    this.#startDate = startTimestamp;
-    this.#endDate = endTimestamp;
-    this.#totalExpense = totalAmount;
+  updateInfo(route, datesString, totalPrice) {
+    this.#routeText = route;
+    this.#datesString = datesString;
+    this.#totalExpense = totalPrice;
 
     const oldElement = this.element;
     const parentContainer = oldElement.parentElement;

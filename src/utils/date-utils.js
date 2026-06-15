@@ -40,6 +40,8 @@ export const formatDate = (date, format = 'DD/MM/YY HH:mm') => dayjs(date).forma
 export const isDateEqual = (dateA, dateB) => dayjs(dateA).isSame(dateB, 'minute');
 
 export const humanizeTripDate = (date) => {
-  if (!date) return '';
+  if (!date) {
+    return '';
+  }
   return dayjs(date).format('DD MMM').toUpperCase();
 };

@@ -60,7 +60,9 @@ export default class TravelApi extends ApiService {
     delete adapted.dateFrom;
     delete adapted.dateEnd;
     delete adapted.isFavorite;
-    if (!adapted.id) delete adapted.id;
+    if (!adapted.id) {
+      delete adapted.id;
+    }
     return adapted;
   }
 }
