@@ -3,6 +3,8 @@ import EditForm from '../view/edit-form-view.js';
 import { EventType } from '../const.js';
 import { isEscapeKey } from '../utils/common-utils.js';
 
+const ONE_HOUR_IN_MS = 3600000;
+
 export default class NewPointPresenter {
   #container = null;
   #pointsModel = null;
@@ -27,7 +29,7 @@ export default class NewPointPresenter {
       type: EventType.FLIGHT,
       destination: '',
       dateFrom: new Date().toISOString(),
-      dateEnd: new Date(Date.now() + 3600000).toISOString(),
+      dateEnd: new Date(Date.now() + ONE_HOUR_IN_MS).toISOString(),
       basePrice: 0,
       offers: [],
       isFavorite: false,

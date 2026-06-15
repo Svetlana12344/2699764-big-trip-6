@@ -5,6 +5,9 @@ import { EventType } from '../const.js';
 
 const SHAKE_TIMEOUT = 500;
 const ALL_EVENT_TYPES = Object.values(EventType);
+const DEFAULT_HOURS_OFFSET = 1;
+const MILLISECONDS_PER_HOUR = 3600000;
+const DEFAULT_PRICE = 0;
 
 const generateTypesHtml = (currentType, isDisabled) => ALL_EVENT_TYPES.map((eventType) => {
   const isChecked = currentType === eventType ? 'checked' : '';
@@ -449,7 +452,7 @@ export default class EditForm extends StatefulComponent {
 
   #handleSubmit = (event) => {
     event.preventDefault();
-    if (!this._state.destination || this._state.basePrice <= 0 || !this._state.dateFrom || !this._state.dateEnd) {
+    if (!this._state.destination || this._state.basePrice <= DEFAULT_PRICE || !this._state.dateFrom || !this._state.dateEnd) {
       this.shakeElement();
       return;
     }
@@ -513,18 +516,21 @@ export default class EditForm extends StatefulComponent {
   #handlePriceInput = (event) => {
     const rawValue = event.target.value.replace(/[^0-9]/g, '');
     event.target.setCustomValidity('');
-    this._setState({ basePrice: Number(rawValue) || 0 });
+    this._setState({ basePrice: Number(rawValue) || DEFAULT_PRICE });
     event.target.value = rawValue;
   };
 
   static parseDataToState(pointData) {
+    const defaultDate = new Date().toISOString();
+    const defaultEndDate = new Date(Date.now() + DEFAULT_HOURS_OFFSET * MILLISECONDS_PER_HOUR).toISOString();
+
     return {
       id: pointData?.id || '',
       type: pointData?.type || 'flight',
       destination: pointData?.destination || '',
-      dateFrom: pointData?.dateFrom || '',
-      dateEnd: pointData?.dateEnd || '',
-      basePrice: pointData?.basePrice || 0,
+      dateFrom: pointData?.dateFrom || defaultDate,
+      dateEnd: pointData?.dateEnd || defaultEndDate,
+      basePrice: pointData?.basePrice || DEFAULT_PRICE,
       offers: Array.isArray(pointData?.offers) ? [...pointData.offers] : [],
       isFavorite: pointData?.isFavorite || false,
       isEditMode: Boolean(pointData?.id),
