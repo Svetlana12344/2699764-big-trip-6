@@ -1,6 +1,6 @@
 import ApiService from './framework/api-service.js';
 
-const HttpMethod = {
+const Method = {
   GET: 'GET',
   PUT: 'PUT',
   POST: 'POST',
@@ -9,42 +9,44 @@ const HttpMethod = {
 
 export default class TravelApi extends ApiService {
   get points() {
-    return this._load({ url: 'points' }).then(ApiService.parseResponse);
+    return this._load({ url: 'points' })
+      .then(ApiService.parseResponse);
   }
 
   get destinations() {
-    return this._load({ url: 'destinations' }).then(ApiService.parseResponse);
+    return this._load({ url: 'destinations' })
+      .then(ApiService.parseResponse);
   }
 
   get offers() {
-    return this._load({ url: 'offers' }).then(ApiService.parseResponse);
+    return this._load({ url: 'offers' })
+      .then(ApiService.parseResponse);
   }
 
   async updatePoint(point) {
     const response = await this._load({
       url: `points/${point.id}`,
-      method: HttpMethod.PUT,
+      method: Method.PUT,
       body: JSON.stringify(this.#toServer(point)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
-    return ApiService.parseResponse(response);
+    return await ApiService.parseResponse(response);
   }
 
   async addPoint(point) {
-    const adapted = this.#toServer(point);
     const response = await this._load({
       url: 'points',
-      method: HttpMethod.POST,
-      body: JSON.stringify(adapted),
+      method: Method.POST,
+      body: JSON.stringify(this.#toServer(point)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
-    return ApiService.parseResponse(response);
+    return await ApiService.parseResponse(response);
   }
 
   async deletePoint(point) {
-    return this._load({
+    return await this._load({
       url: `points/${point.id}`,
-      method: HttpMethod.DELETE,
+      method: Method.DELETE,
     });
   }
 
@@ -60,9 +62,7 @@ export default class TravelApi extends ApiService {
     delete adapted.dateFrom;
     delete adapted.dateEnd;
     delete adapted.isFavorite;
-    if (!adapted.id) {
-      delete adapted.id;
-    }
+    if (!adapted.id) delete adapted.id;
     return adapted;
   }
 }

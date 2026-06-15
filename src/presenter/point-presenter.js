@@ -43,18 +43,22 @@ export default class PointPresenter {
       point: this.#currentPoint,
       destination,
       offers: pointOffers,
-      onRollupClick: this.#openEdit,
-      onFavoriteClick: this.#toggleFavorite,
+      onRollupClick: () => this.#openEdit(),
+      onFavoriteClick: () => this.#toggleFavorite(),
     });
+
+    if (this.#viewComponent && this.#viewComponent.element) {
+      this.#viewComponent.setHandlers();
+    }
 
     this.#editComponent = new EditForm({
       point: this.#currentPoint,
       destinations: this.#pointsModel.getDestinations(),
       allOffers: this.#pointsModel.getOffers(),
       isNew: false,
-      onFormSubmit: this.#save,
-      onCloseClick: this.#closeEdit,
-      onDeleteClick: this.#delete,
+      onFormSubmit: (updatedPoint) => this.#save(updatedPoint),
+      onCloseClick: () => this.#closeEdit(),
+      onDeleteClick: (pointToDelete) => this.#delete(pointToDelete),
     });
 
     if (!prevView || !prevEdit) {
@@ -74,8 +78,12 @@ export default class PointPresenter {
   }
 
   destroy() {
-    remove(this.#viewComponent);
-    remove(this.#editComponent);
+    if (this.#viewComponent) {
+      remove(this.#viewComponent);
+    }
+    if (this.#editComponent) {
+      remove(this.#editComponent);
+    }
   }
 
   resetView() {
@@ -99,9 +107,9 @@ export default class PointPresenter {
       destinations: this.#pointsModel.getDestinations(),
       allOffers: this.#pointsModel.getOffers(),
       isNew: false,
-      onFormSubmit: this.#save,
-      onCloseClick: this.#closeEdit,
-      onDeleteClick: this.#delete,
+      onFormSubmit: (updatedPoint) => this.#save(updatedPoint),
+      onCloseClick: () => this.#closeEdit(),
+      onDeleteClick: (pointToDelete) => this.#delete(pointToDelete),
     });
     this.#currentMode = DisplayMode.VIEW;
   };
@@ -120,26 +128,36 @@ export default class PointPresenter {
         { ...this.#currentPoint, isFavorite: !this.#currentPoint.isFavorite }
       );
     } catch {
-      this.#viewComponent.shake();
+      if (this.#viewComponent) {
+        this.#viewComponent.shake();
+      }
     }
   };
 
   #save = async (updatedPoint) => {
-    this.#editComponent.setSavingState();
+    if (this.#editComponent) {
+      this.#editComponent.setSavingState();
+    }
     try {
       await this.#onDataChange?.(UserAction.UPDATE_EVENT, updatedPoint);
       this.#closeEdit();
     } catch {
-      this.#editComponent.shake(() => this.#editComponent.setDefaultState());
+      if (this.#editComponent) {
+        this.#editComponent.shake(() => this.#editComponent.setDefaultState());
+      }
     }
   };
 
   #delete = async (pointToDelete) => {
-    this.#editComponent.setDeletingState();
+    if (this.#editComponent) {
+      this.#editComponent.setDeletingState();
+    }
     try {
       await this.#onDataChange?.(UserAction.DELETE_EVENT, pointToDelete);
     } catch {
-      this.#editComponent.shake(() => this.#editComponent.setDefaultState());
+      if (this.#editComponent) {
+        this.#editComponent.shake(() => this.#editComponent.setDefaultState());
+      }
     }
   };
 }
